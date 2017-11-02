@@ -1,4 +1,4 @@
-package bank_server;
+package atm_client;
 
 //Package for parsing command line arguments
 import org.apache.commons.cli.*; 
@@ -31,15 +31,31 @@ public class Main {
 		
 		//Add options: 
 		Options options = new Options(); 
-		options.addOption("p", true, "The port for this server to run on"); 
+		options.addOption("a", true, "The customer's account name"); 
 		options.addOption("s", true, "The authorization file"); 
+		options.addOption("i", true, "The IP address for this server to run on"); 
+		options.addOption("p", true, "The port for this server to run on"); 
+		options.addOption("c", true, "The customer's ATM card file"); 
 		CommandLineParser parser = new DefaultParser(); 
 		
 		int port = 3000; 
+		String IP = "127.0.0.1";
 		String authFile = "bank.auth"; 
+		String accountName;
+		String cardFile;
 		
 		try {
 			CommandLine cmd = parser.parse(options, args);
+			
+			// Check for account name
+			if(cmd.hasOption("a")) {
+				accountName = cmd.getOptionValue("a");
+				cardFile = accountName + ".card";
+			}
+			
+			else {
+				System.out.println("Need an account name entered");
+			}
 			
 			//Check for port option
 			if(cmd.hasOption("p")) {
@@ -56,6 +72,18 @@ public class Main {
 			if(cmd.hasOption("s")) {
 				authFile = cmd.getOptionValue("s"); 
 			} 
+			
+			// Check for IP address
+			if(cmd.hasOption("p")) {
+				IP = cmd.getOptionValue("p"); 
+			} 
+			
+			// Check for Card File
+			if(cmd.hasOption("c")) {
+				cardFile = cmd.getOptionValue("c") + ".card"; 
+			} 
+			
+			
 			
 		} catch(Exception e) {
 			e.printStackTrace(); 
