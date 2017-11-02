@@ -1,0 +1,2 @@
+#!/bin/bash
+java -cp ./src/:./lib/commons-cli-1.4.jar bank_server.Main $@
