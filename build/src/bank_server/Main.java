@@ -42,6 +42,9 @@ public class Main {
 			e.printStackTrace(); 
 			System.exit(255); 
 		}
+		
+		Server bankServer = new Server(portNumber,authFile); 
+		bankServer.makeAuthFile(); 
 	}
 
 }
