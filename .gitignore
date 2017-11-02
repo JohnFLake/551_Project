@@ -1,7 +1,9 @@
 bin/*
 build/bin/*
+build/makebin/*
 build/lib/*
 .DS_Store
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
+
