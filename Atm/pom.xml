@@ -1,0 +1,14 @@
+<project>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>edu.upenn.cis.551.bank</groupId>
+   <version>1.0</version>
+   <artifactId>Atm</artifactId>
+   <packaging>pom</packaging>
+   <name>Atm</name>
+   <build>
+      <pluginManagement>
+         <plugins>
+         </plugins>
+      </pluginManagement>
+   </build>
+</project>
