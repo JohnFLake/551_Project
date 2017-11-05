@@ -28,6 +28,6 @@
 	</build>
 	<properties>
 		<outDir>atm</outDir>
-		<mainClass>edu.upenn.cis551.bank.Atm</mainClass>
+		<mainClass>edu.upenn.cis551.pncbank.Atm</mainClass>
 	</properties>
 </project>

@@ -1,4 +1,4 @@
-package edu.upenn.cis551.bank.encryption;
+package edu.upenn.cis551.pncbank.encryption;
 
 /**
  * Interface for an encryption method. Satisfies the constraint that <code>s == decrypt(encrypt(s,

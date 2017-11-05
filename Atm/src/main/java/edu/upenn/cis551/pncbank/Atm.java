@@ -1,4 +1,4 @@
-package edu.upenn.cis551.bank;
+package edu.upenn.cis551.pncbank;
 
 public class Atm {
   public static void main(String[] args) {

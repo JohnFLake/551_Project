@@ -1,4 +1,4 @@
-package edu.upenn.cis551.bank.encryption;
+package edu.upenn.cis551.pncbank.encryption;
 
 /**
  * Exception indicating a failure to encrypt or decrypt.
