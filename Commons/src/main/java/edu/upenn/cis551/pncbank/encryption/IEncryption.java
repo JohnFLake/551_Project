@@ -7,7 +7,7 @@ package edu.upenn.cis551.pncbank.encryption;
  * @author jlautman
  *
  */
-public interface IEncryption<E, D> {
+public interface IEncryption<D, E> {
   /**
    * Decrypts data using the provided key.
    * 
@@ -27,4 +27,12 @@ public interface IEncryption<E, D> {
    * @throws EncryptionException On failure to encrypt.
    */
   String encrypt(String raw, E key) throws EncryptionException;
+
+  /**
+   * Generate a new pair of decryption and encryption keys for this encryption schema.
+   * 
+   * @return An EncryptionKeys containing a new set of keys. May not be null, but they contained
+   *         keys may be if the schema doesn't need them.
+   */
+  EncryptionKeys<D, E> genKeys();
 }

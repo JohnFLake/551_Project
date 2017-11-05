@@ -16,4 +16,8 @@ public class NoEncryption implements IEncryption<Object, Object> {
     return raw;
   }
 
+  public EncryptionKeys<Object, Object> genKeys() {
+    return new EncryptionKeys<Object, Object>(null, null);
+  }
+
 }
