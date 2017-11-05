@@ -6,6 +6,7 @@
 - Withdraw more money than the account has in it
 - Underflow/overflow the account balance
 - Open a duplicate account (clobbering the existing value)
+- Crash the bank with a fuzzed input
 
 #### ATM without the right card (either with another card or with nothing)
 - See the balance of the account
