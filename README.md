@@ -14,6 +14,7 @@
 - Withdraw from the account
 - Derive the atm card from one the attacker has
 - Deposit into the account (weird attack)
+- Open as many accounts as possible as fast as possible (crash the bank)
 
 #### No ATM with or without card (forge transactions without bank.auth)
 - Deposit money
