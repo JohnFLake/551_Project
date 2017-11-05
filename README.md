@@ -19,3 +19,7 @@
 - See balance (probably not a big deal)
 
 ### Man in the middle
+- Derive a malicious but valid transaction by seeing a real valid transaction
+- Change a value in a valid transaction
+- Change the response from the bank to a valid transaction
+
