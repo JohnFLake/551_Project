@@ -2,8 +2,8 @@ bin/*
 build/bin/*
 build/makebin/*
 build/lib/*
+build/bank
+build/atm
 .DS_Store
-.classpath
-.project
 .settings/
 */.settings/

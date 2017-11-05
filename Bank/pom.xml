@@ -1,14 +1,27 @@
-<project>
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>edu.upenn.cis.551.bank</groupId>
-   <version>1.0</version>
-   <artifactId>Bank</artifactId>
-   <packaging>pom</packaging>
-   <name>Bank</name>
-   <build>
-      <pluginManagement>
-         <plugins>
-         </plugins>
-      </pluginManagement>
-   </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>551_Project</groupId>
+		<artifactId>551_Project</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>Bank</artifactId>
+	<packaging>jar</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<outDir>bank</outDir>
+		<mainClass>edu.upenn.cis551.bank.Bank</mainClass>
+	</properties>
 </project>
