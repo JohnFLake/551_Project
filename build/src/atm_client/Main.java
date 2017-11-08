@@ -36,7 +36,15 @@ public class Main {
 		options.addOption("i", true, "The IP address for this server to run on"); 
 		options.addOption("p", true, "The port for this server to run on"); 
 		options.addOption("c", true, "The customer's ATM card file"); 
+		options.addOption("n", false, "Create account with specified amount"); 
+		options.addOption("d", false, "Deposit amount"); 
+		options.addOption("w", false, "Withdrawl amount"); 
+		options.addOption("g", false, "Check account amount"); 
+		
+		System.
 		CommandLineParser parser = new DefaultParser(); 
+		
+		
 		
 		int port = 3000; 
 		String IP = "127.0.0.1";
@@ -89,6 +97,10 @@ public class Main {
 			e.printStackTrace(); 
 			System.out.println("wrong args fam.");
 		}
+		
+		Client newclient = new Client(authFile, IP, port, cardFile, accountName);
+		System.out.println("Connected");
+		
 	}
 
 }

@@ -30,6 +30,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
+			
 		//Add options: 
 		Options options = new Options(); 
 		options.addOption("a", true, "The customer's account name"); 
@@ -41,13 +42,16 @@ public class Main {
 		options.addOption("d", false, "Deposit money"); 
 		options.addOption("w", false, "Withdrawl Money"); 
 		options.addOption("g", false, "Check Balance"); 
-		CommandLineParser parser = new DefaultParser(); 
+		CommandLineParser parser = new BasicParser();
 		
 		int port = 3000; 
 		String IP = "127.0.0.1";
 		String authFile = "bank.auth"; 
-		String accountName = "";
-		String cardFile = "";
+		String accountName = "b";
+		String cardFile = "b";
+		
+		Atm client = new Atm(authFile, IP, port, cardFile, accountName);
+		client.CheckBalance();
 		
 		try {
 			CommandLine cmd = parser.parse(options, args);
@@ -124,7 +128,7 @@ public class Main {
 			} 
 			
 			
-			Atm client = new Atm(authFile, IP, port, cardFile, accountName);
+			//Atm client = new Atm(authFile, IP, port, cardFile, accountName);
 			
 			if(cmd.hasOption("g"))
 			{
