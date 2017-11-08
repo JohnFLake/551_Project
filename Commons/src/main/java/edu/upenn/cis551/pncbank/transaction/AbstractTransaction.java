@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
     @JsonSubTypes.Type(value = WithdrawPOJO.class, name = "Withdraw"),
     @JsonSubTypes.Type(value = DepositPOJO.class, name = "Deposit")//
 })
-public class AbstractTransaction {
+public abstract class AbstractTransaction {
   final long sequenceNumber;
   final String accountName;
 
