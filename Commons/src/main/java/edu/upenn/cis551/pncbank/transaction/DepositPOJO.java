@@ -1,11 +1,14 @@
 package edu.upenn.cis551.pncbank.transaction;
 
-public class DepositPOJO {
-  final String accountName;
-  final long amount;
-  
-  public DepositPOJO (String accountName, long amount) {
-    this.accountName = accountName;
-    this.amount = amount;
+public class DepositPOJO extends AbstractTransaction {
+  final long deposit;
+
+  public DepositPOJO(String accountName, long amount, long sequenceNumber) {
+    super(accountName, sequenceNumber);
+    this.deposit = amount;
+  }
+
+  public final long getDeposit() {
+    return this.deposit;
   }
 }
