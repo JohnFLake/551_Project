@@ -14,27 +14,9 @@ import javax.crypto.spec.SecretKeySpec;
  * @author jlautman
  *
  */
-public interface IEncryption{
+public interface IEncryption<EKey, DKey>{
   
-  /*
-   * Methods to encrypt and decrypt RSA, as well as to make a keypair. 
-   */
-  String encryptRSA(String plaintext, PublicKey key) throws EncryptionException; 
-  String decryptRSA(String ciphertext, PrivateKey key) throws EncryptionException;
-  KeyPair generateRSAKeys() throws EncryptionException;
-  
-  /*
-   * Methods to encrypt and decrypt AES, as well as to make an AES key. 
-   */
-  String encryptAES(String plaintext, SecretKey aesKey) throws EncryptionException;
-  String decryptAES(String ciphertext,SecretKey aesKey) throws EncryptionException;
-  SecretKey generateAESKey() throws EncryptionException;
-  
-  
-  /*
-   * Methods to sign and verify messages with RSA
-   */
-  String sign(String plaintext, PrivateKey key) throws EncryptionException;
-  boolean verify(String plaintext, String signature, PublicKey key) throws EncryptionException;
- 
+  String encrypt(String plaintext,  EKey key) throws EncryptionException; 
+  String decrypt(String ciphertext, DKey key) throws EncryptionException; 
+  Object generateKey() throws EncryptionException; 
 }
