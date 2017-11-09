@@ -10,31 +10,66 @@ import java.math.BigInteger;
  *
  * @param <D> The type of the validator object that the account uses.
  */
-public class Account<D> {
-  /**
-   * The id of this account.
-   */
-  private final String accountId;
+public class Account {
   /**
    * Current account balance. Uses a BigInteger to prevent overflow/underflow.
    */
-  private BigInteger balance;
-  private D cardValidator;
+  BigInteger balance;
+  String cardValidator;
+  long sequence;
 
-  public Account(String id, long balance, D validator) {
-    this.accountId = id;
+  public Account(long balance, String validator, long sequence) {
     this.balance = BigInteger.valueOf(balance);
     this.cardValidator = validator;
+    this.sequence = sequence;
   }
 
-  public boolean updateValue(long amount, String validation) {
-    // TODO use the validation with this account's card validator to ensure the transaction is
-    // allowed.
-    BigInteger newVal = this.balance.add(BigInteger.valueOf(amount));
+  /**
+   * @return the balance
+   */
+  public final BigInteger getBalance() {
+    return this.balance;
+  }
+
+  /**
+   * @return the cardValidator
+   */
+  public final String getCardValidator() {
+    return this.cardValidator;
+  }
+
+  /**
+   * @return the sequence
+   */
+  public final long getSequence() {
+    return this.sequence;
+  }
+
+  /**
+   * Updates the value in the account. The caller is responsible for making sure that the update is
+   * validated by the validator and the sequence number (which is why the method is package
+   * private).
+   * 
+   * @param delta The change to make on the account value
+   * @return false iff the amount results in a negative balance.
+   */
+  boolean updateValue(long delta) {
+    BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
     if (newVal.compareTo(BigInteger.ZERO) < 0) {
       return false;
     }
     this.balance = newVal;
+    this.sequence++;
     return true;
+  }
+
+  /**
+   * Reads the balance of the account and increases the sequence number.
+   * 
+   * @return The String representation of the balance.
+   */
+  public String readValueTransaction() {
+    this.sequence++;
+    return this.balance.toString();
   }
 }

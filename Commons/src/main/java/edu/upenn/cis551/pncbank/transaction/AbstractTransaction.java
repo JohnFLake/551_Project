@@ -1,6 +1,13 @@
 package edu.upenn.cis551.pncbank.transaction;
 
-public class AbstractTransaction {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+
+@JsonSubTypes({//
+    @JsonSubTypes.Type(value = CreateAccountPOJO.class, name = "CreateAccount"),
+    @JsonSubTypes.Type(value = WithdrawPOJO.class, name = "Withdraw"),
+    @JsonSubTypes.Type(value = DepositPOJO.class, name = "Deposit")//
+})
+public abstract class AbstractTransaction {
   final long sequenceNumber;
   final String accountName;
 

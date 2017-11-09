@@ -1,12 +1,14 @@
 package edu.upenn.cis551.pncbank.transaction;
 
 public class WithdrawPOJO extends AbstractTransaction {
-  
-  final long withdraw;
 
-  public WithdrawPOJO(String accountName, long amount, long sequenceNumber) {
+  final long withdraw;
+  final String validation;
+
+  public WithdrawPOJO(String accountName, String validation, long amount, long sequenceNumber) {
     super(accountName, sequenceNumber);
     this.withdraw = amount;
+    this.validation = validation;
   }
 
   /**
@@ -14,6 +16,10 @@ public class WithdrawPOJO extends AbstractTransaction {
    */
   public final long getWithdraw() {
     return this.withdraw;
+  }
+
+  public final String getValidation() {
+    return this.validation;
   }
 
 }
