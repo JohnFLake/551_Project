@@ -10,19 +10,14 @@ import java.math.BigInteger;
  *
  * @param <D> The type of the validator object that the account uses.
  */
-public class Account<D> {
-  /**
-   * The id of this account.
-   */
-  private final String accountId;
+public class Account {
   /**
    * Current account balance. Uses a BigInteger to prevent overflow/underflow.
    */
   private BigInteger balance;
-  private D cardValidator;
+  private String cardValidator;
 
-  public Account(String id, long balance, D validator) {
-    this.accountId = id;
+  public Account(long balance, String validator) {
     this.balance = BigInteger.valueOf(balance);
     this.cardValidator = validator;
   }
