@@ -4,7 +4,8 @@ public class CreateAccountPOJO extends AbstractTransaction {
   final long balance;
   final String validator;
 
-  public CreateAccountPOJO(String accountName, String validator, long balance, long sequenceNumber) {
+  public CreateAccountPOJO(String accountName, String validator, long balance,
+      long sequenceNumber) {
     super(accountName, sequenceNumber);
     this.balance = balance;
     this.validator = validator;
@@ -13,8 +14,9 @@ public class CreateAccountPOJO extends AbstractTransaction {
   public long getBalance() {
     return this.balance;
   }
-  
+
   public String getValidator() {
     return this.validator;
   }
+
 }

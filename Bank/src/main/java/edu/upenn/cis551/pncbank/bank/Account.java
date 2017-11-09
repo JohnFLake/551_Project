@@ -14,9 +14,9 @@ public class Account {
   /**
    * Current account balance. Uses a BigInteger to prevent overflow/underflow.
    */
-  private BigInteger balance;
-  private String cardValidator;
-  private long sequence;
+  BigInteger balance;
+  String cardValidator;
+  long sequence;
 
   public Account(long balance, String validator, long sequence) {
     this.balance = BigInteger.valueOf(balance);
@@ -25,29 +25,54 @@ public class Account {
   }
 
   /**
+   * @return the balance
+   */
+  public final BigInteger getBalance() {
+    return this.balance;
+  }
+
+  /**
+   * @return the cardValidator
+   */
+  public final String getCardValidator() {
+    return this.cardValidator;
+  }
+
+  /**
+   * @return the sequence
+   */
+  public final long getSequence() {
+    return this.sequence;
+  }
+
+  /**
+   * Updates the value in the account. The caller is responsible for making sure that the update is
+   * validated by the validator and the sequence number (which is why the method is package
+   * private).
    * 
-   * @param amount The change to make on the account value
+   * @param delta The change to make on the account value
    * @param validation The string to validate using the account's cardValidator.
    * @param sequence The sequence number that the request sent.
    * @return false iff the wrong sequence number is found, the validation fails, or the amount
    *         results in a negative balance.
    */
-  public boolean updateValue(long amount, String validation, long sequence) {
-    if (sequence != this.sequence) {
-      // Wrong sequence number.
-      return false;
-    }
-    // TODO use the validation with this account's card validator to ensure the transaction is
-    // allowed.
-    BigInteger newVal = this.balance.add(BigInteger.valueOf(amount));
+  boolean updateValue(long delta) {
+    BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
     if (newVal.compareTo(BigInteger.ZERO) < 0) {
       return false;
     }
     this.balance = newVal;
+    this.sequence++;
     return true;
   }
 
-  public long getSequence() {
-    return this.sequence;
+  /**
+   * Reads the balance of the account and increases the sequence number.
+   * 
+   * @return The String representation of the balance.
+   */
+  public String readValue() {
+    this.sequence++;
+    return this.balance.toString();
   }
 }

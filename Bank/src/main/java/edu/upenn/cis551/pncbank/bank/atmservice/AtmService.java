@@ -8,6 +8,7 @@ import java.net.Socket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis551.pncbank.bank.AccountManager;
 import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
+import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 
 /**
  * Accepts requests from an ATM, verifies that they are from an ATM, and then passes along any
@@ -35,15 +36,16 @@ public class AtmService {
     try (Socket s = socketBinding.accept()) {
       InputStream is = s.getInputStream();
       // TODO Decryption of the data from the atm goes here
+      AbstractTransaction at;
       try {
-        AbstractTransaction at = mapper.readValue(is, AbstractTransaction.class);
+        at = mapper.readValue(is, AbstractTransaction.class);
       } catch (IOException e) {
         // TODO replace with the correct error message
         sendEncryptedResponse(s.getOutputStream(), "failure");
         return;
       }
-      // TODO Do stuff with the account manager here and build the actual response
-      String response = "{}";
+      TransactionResponse tr = am.apply(at);
+      String response = mapper.writeValueAsString(tr);
 
       sendEncryptedResponse(s.getOutputStream(), response);
       s.close();
