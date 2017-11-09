@@ -160,7 +160,7 @@ public class Main {
 				String moneystring = cmd.getOptionValue("n");
 				int money = Integer.parseInt(moneystring);
 
-				send = new CreateAccountPOJO(accountName,money,seqNumber);
+				send = new CreateAccountPOJO(accountName,cardFile,money,seqNumber);
 				sendstring = objectMapper.writeValueAsString(send);
 			}
 
@@ -169,7 +169,7 @@ public class Main {
 				String moneystring = cmd.getOptionValue("w");
 				long money = Integer.parseInt(moneystring);
 
-				send = new WithdrawPOJO(accountName,money,seqNumber);
+				send = new WithdrawPOJO(accountName,cardFile,money,seqNumber);
 				sendstring = objectMapper.writeValueAsString(send);
 			}
 
@@ -178,7 +178,7 @@ public class Main {
 				String moneystring = cmd.getOptionValue("d");
 				long money = Integer.parseInt(moneystring);
 
-				send = new DepositPOJO(accountName,money,seqNumber);
+				send = new DepositPOJO(accountName, cardFile, money,seqNumber);
 				sendstring = objectMapper.writeValueAsString(send);
 			}
 
