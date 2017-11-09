@@ -17,7 +17,7 @@ public class WithdrawPOJO extends AbstractTransaction {
   public final long getWithdraw() {
     return this.withdraw;
   }
-  
+
   public final String getValidation() {
     return this.validation;
   }
