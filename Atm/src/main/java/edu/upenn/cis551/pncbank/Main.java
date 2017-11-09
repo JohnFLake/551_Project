@@ -17,8 +17,10 @@ import org.apache.commons.cli.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.CreateAccountPOJO;
 import edu.upenn.cis551.pncbank.transaction.DepositPOJO;
+import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 import edu.upenn.cis551.pncbank.transaction.WithdrawPOJO; 
 
 public class Main {
@@ -183,10 +185,29 @@ public class Main {
 			}
 
 			String response = null;
+			Socket AtmBank = null;
 			try {
-				Socket AtmBank = new Socket(IP,port);
+				AtmBank = new Socket(IP,port);
 				try {
 					response = writeToAndReadFromSocket(AtmBank, sendstring);
+					
+					if(cmd.hasOption("g"))
+					{
+						BalanceResponse bResponse = objectMapper.readValue(response, BalanceResponse.class);
+						if(!bResponse.isOk())
+						{
+							System.exit(255);
+						}
+					}
+					
+					else
+					{
+						TransactionResponse tResponse = objectMapper.readValue(response, TransactionResponse.class);
+						if(!tResponse.isOk())
+						{
+							System.exit(255);
+						}						
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -200,33 +221,11 @@ public class Main {
 			}
 
 
-
-			if(cmd.hasOption("g"))
-			{
-				//client.CheckBalance();
-			}
-
-			else if(cmd.hasOption("n"))
-			{
-				CreateAccountPOJO cResponse = objectMapper.readValue(response, CreateAccountPOJO.class);
-				
-				// This needs to be fixed because it has to be a JSON string output
-				System.out.println("account:" + cResponse.getAccountName() +", initial balance: " + cResponse.getBalance());
-				
-			}
-
-			else if(cmd.hasOption("w"))
-			{
-				WithdrawPOJO cWithdraw = objectMapper.readValue(response, WithdrawPOJO.class);
-				System.out.println("account:" + cWithdraw.getAccountName() +", withdraw: " + cWithdraw.getWithdraw());
-			}
-
-			else if(cmd.hasOption("d"))
-			{
-				DepositPOJO cDeposit = objectMapper.readValue(response, DepositPOJO.class);
-				System.out.println("account:" + cDeposit.getAccountName() +", deposit: " + cDeposit.getDeposit());
-			}
-
+			AtmBank.close();
+			
+			//Update sendstring so it doesnt print seq number 
+			
+			System.out.println(sendstring);
 
 		} catch(Exception e) {
 			e.printStackTrace(); 
@@ -237,10 +236,10 @@ public class Main {
 
 	public static String writeToAndReadFromSocket(Socket socket, String writeTo) throws Exception
 	{
-		try 
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) 
 		{
 			// write text to the socket
-			BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			
 			bufferedWriter.write(writeTo);
 			bufferedWriter.flush();
 
