@@ -73,7 +73,7 @@ public class AccountManager {
       if(!checkSequenceValidation(a, validation, sequence)) {
         return new TransactionResponse(false, accountId, sequence);
       }
-      return new BalanceResponse(true, accountId, sequence, a.readValue());
+      return new BalanceResponse(true, accountId, sequence, a.readValueTransaction());
     }
     return null;
   }

@@ -51,10 +51,7 @@ public class Account {
    * private).
    * 
    * @param delta The change to make on the account value
-   * @param validation The string to validate using the account's cardValidator.
-   * @param sequence The sequence number that the request sent.
-   * @return false iff the wrong sequence number is found, the validation fails, or the amount
-   *         results in a negative balance.
+   * @return false iff the amount results in a negative balance.
    */
   boolean updateValue(long delta) {
     BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
@@ -71,7 +68,7 @@ public class Account {
    * 
    * @return The String representation of the balance.
    */
-  public String readValue() {
+  public String readValueTransaction() {
     this.sequence++;
     return this.balance.toString();
   }
