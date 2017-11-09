@@ -275,6 +275,30 @@ public class AccountManagerTest {
   }
 
   @Test
+  public void test_apply_withdraw_noaccount() {
+    // Setup
+    String accountName = "test";
+    String validator = "validator";
+    long sequence = 12345;
+    long amount = 100;
+    AccountManager test = new AccountManager();
+    WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator, amount, sequence);
+
+    // Run
+    TransactionResponse t = test.apply(deposit);
+
+    // Verify
+    // State is unchanged
+    Assert.assertFalse(test.accounts.containsKey(accountName));
+
+    // Response is correct
+    Assert.assertNotNull(t);
+    Assert.assertEquals(accountName, t.getAccountId());
+    Assert.assertEquals(sequence, t.getSequence());
+    Assert.assertFalse(t.isOk());
+  }
+
+  @Test
   public void test_apply_withdraw_negamount() {
     // Setup
     String accountName = "test";
@@ -425,6 +449,29 @@ public class AccountManagerTest {
     Assert.assertTrue(b.isOk());
     Assert.assertEquals(sequence, b.getSequence());
     Assert.assertEquals(accountName, b.getAccountId());
+  }
+
+  @Test
+  public void test_apply_balance_noaccount() {
+    // Setup
+    String accountName = "test";
+    String validator = "validator";
+    long sequence = 12345;
+    AccountManager test = new AccountManager();
+    BalancePOJO bal = new BalancePOJO(accountName, validator, sequence);
+
+    // Run
+    TransactionResponse t = test.apply(bal);
+
+    // Verify
+    // State is unchanged
+    Assert.assertFalse(test.accounts.containsKey(accountName));
+
+    // Response is correct
+    Assert.assertFalse(t instanceof BalanceResponse);
+    Assert.assertFalse(t.isOk());
+    Assert.assertEquals(sequence, t.getSequence());
+    Assert.assertEquals(accountName, t.getAccountId());
   }
 
   @Test
