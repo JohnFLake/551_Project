@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.Base64;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.json4s.jackson.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Authentication {
