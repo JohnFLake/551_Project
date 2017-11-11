@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.crypto.SecretKey;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis551.pncbank.bank.AccountManager;
 import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
@@ -20,9 +21,9 @@ import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 public class AtmService {
   private ServerSocket socketBinding;
   private ObjectMapper mapper;
-  private String aesKey;
+  private SecretKey aesKey;
 
-  public AtmService(int port, String aesKey) throws IOException {
+  public AtmService(int port, SecretKey aesKey) throws IOException {
     socketBinding = new ServerSocket(port);
     mapper = new ObjectMapper();
     this.aesKey = aesKey;
