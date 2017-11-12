@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -26,7 +25,7 @@ public class Bank implements AutoCloseable {
 
   public static final String DEFAULT_BANK_AUTH = "bank.auth";
   public static final String DEFAULT_BANK_PORT = "3000";
-  static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption(); 
+  static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption();
 
   private final int port;
   private final SecretKey bankKey;
@@ -60,31 +59,31 @@ public class Bank implements AutoCloseable {
     }
   }
 
-  
+
   byte[] getBytesFromInputStream(InputStream in) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     byte[] buf = new byte[4096];
-    while(true) {
+    while (true) {
       int n = in.read(buf);
-      if( n < 0 ) break;
-      baos.write(buf,0,n);
+      if (n < 0)
+        break;
+      baos.write(buf, 0, n);
     }
 
     byte data[] = baos.toByteArray();
-    return data; 
+    return data;
   }
-  
-  
+
+
   void handleTransaction(Socket s) {
-    try (InputStream in = s.getInputStream();
-        OutputStream out = s.getOutputStream();) {
+    try (InputStream in = s.getInputStream(); OutputStream out = s.getOutputStream();) {
       // Read encrypted input
-      
-      byte[] inputData = getBytesFromInputStream(in); 
+
+      byte[] inputData = getBytesFromInputStream(in);
       System.out.println(new String(inputData));
       System.out.println(inputData.length);
-      System.out.flush(); 
+      System.out.flush();
       // Decrypt into a transaction request
       byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
       AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
