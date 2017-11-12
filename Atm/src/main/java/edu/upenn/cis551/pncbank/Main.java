@@ -61,6 +61,14 @@ public class Main {
 				System.exit(255);
 			}
 			
+			if(!cmd.hasOption("a")) {
+				System.exit(255);
+			}
+			
+			else {
+				accountName = cmd.getOptionValue("a");
+			}
+			
 			// Check for account name and update card file name
 			cardFile = Atm.cardFile(cmd);
 
@@ -88,7 +96,7 @@ public class Main {
 			}
 			
 			else {
-				 authKey = Authentication.getAESKeyFromAuthFile("bank.auth");
+				 authKey = Authentication.getAESKeyFromAuthFile("/Users/ryanhub/git/551_Project/Commons/bank.auth");
 			}
 
 			atmSession session = new atmSession(IP,port,authKey);
@@ -97,16 +105,38 @@ public class Main {
 			// Check for transaction option and execute
 			if(cmd.hasOption("n"))
 			{
-				atmclient.newAccount(session, accountName, Integer.parseInt(cmd.getOptionValue("n")));
+				int amount = 0;
+				//try { 
+				amount = Integer.parseInt(cmd.getOptionValue("n"));
+				//}
+				//catch (NumberFormatException ex){
+				//	System.exit(255);
+				//}
+		
+				atmclient.newAccount(session, accountName, amount);
 			}
 			
 			else if(cmd.hasOption("d"))
 			{
+				try { 
+				Integer.parseInt(cmd.getOptionValue("n"));
+				}
+				catch (NumberFormatException ex){
+					System.exit(255);
+				}
+				
 				atmclient.Deposit(session, accountName, Integer.parseInt(cmd.getOptionValue("d")));
 			}
 			
 			else if(cmd.hasOption("w"))
 			{
+				try { 
+				Integer.parseInt(cmd.getOptionValue("n"));
+				}
+				catch (NumberFormatException ex){
+					System.exit(255);
+				}
+				
 				atmclient.Withdraw(session, accountName, Integer.parseInt(cmd.getOptionValue("w")));
 			}		
 			
@@ -115,8 +145,7 @@ public class Main {
 				atmclient.checkBalance(session, accountName);
 			}
 			
-			
-			
+				
 		} catch(Exception e) {
 			e.printStackTrace(); 
 			System.out.println("wrong args fam.");

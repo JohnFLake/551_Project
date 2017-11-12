@@ -55,7 +55,7 @@ public class Atm {
 
 	public static boolean properTransaction(CommandLine cmd)
 	{
-		if(!cmd.hasOption("n") || !cmd.hasOption("d") || !cmd.hasOption("w") || !cmd.hasOption("g"))
+		if(!cmd.hasOption("n") && !cmd.hasOption("d") && !cmd.hasOption("w") && !cmd.hasOption("g"))
 		{
 			return false;	
 		}
