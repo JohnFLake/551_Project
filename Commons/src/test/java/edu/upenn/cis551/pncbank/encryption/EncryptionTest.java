@@ -1,12 +1,8 @@
 package edu.upenn.cis551.pncbank.encryption;
 
 import static org.junit.Assert.*;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Base64;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import org.junit.Test;
 
 public class EncryptionTest {
