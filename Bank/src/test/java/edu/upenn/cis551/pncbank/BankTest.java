@@ -9,7 +9,7 @@ import edu.upenn.cis551.pncbank.encryption.AESEncryption;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.EncryptionPair;
 
-public class TestATMInteractions {
+public class BankTest {
   private Bank bank;
   private EncryptionPair<SecretKey, SecretKey> keys;
   private final AESEncryption aes = new AESEncryption();
