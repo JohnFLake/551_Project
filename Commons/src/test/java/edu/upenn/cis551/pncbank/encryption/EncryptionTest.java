@@ -14,10 +14,10 @@ public class EncryptionTest {
   @Test
   public void testAESEncryptDecrypt() throws Exception{
     AESEncryption enc = new AESEncryption(); 
-    SecretKey k = enc.generateKey(); 
+    EncryptionPair<SecretKey, SecretKey> p = enc.generateKey(); 
     String message = "Secret Message"; 
-    String ct = enc.encrypt(message, k); 
-    String pt = enc.decrypt(ct, k); 
+    String ct = enc.encrypt(message, p.getEncryptionKey()); 
+    String pt = enc.decrypt(ct, p.getDecryptionKey()); 
     assertEquals(message,pt); 
   }
   
