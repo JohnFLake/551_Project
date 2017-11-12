@@ -9,7 +9,7 @@ package edu.upenn.cis551.pncbank.encryption;
  */
 public interface IEncryption<EKey, DKey>{
   
-  String encrypt(String plaintext,  EKey key) throws EncryptionException; 
-  String decrypt(String ciphertext, DKey key) throws EncryptionException; 
+  byte[] encrypt(byte[] plaintext,  EKey key) throws EncryptionException; 
+  byte[] decrypt(byte[] ciphertext, DKey key) throws EncryptionException; 
   EncryptionPair<EKey, DKey> generateKey() throws EncryptionException; 
 }
