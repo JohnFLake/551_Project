@@ -1,5 +1,6 @@
 package edu.upenn.cis551.pncbank;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +15,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis551.pncbank.bank.AccountManager;
+import edu.upenn.cis551.pncbank.encryption.AESEncryption;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
@@ -24,7 +26,7 @@ public class Bank implements AutoCloseable {
 
   public static final String DEFAULT_BANK_AUTH = "bank.auth";
   public static final String DEFAULT_BANK_PORT = "3000";
-  static IEncryption<SecretKey, SecretKey> encryption;
+  static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption(); 
 
   private final int port;
   private final SecretKey bankKey;
@@ -58,19 +60,37 @@ public class Bank implements AutoCloseable {
     }
   }
 
+  
+  byte[] getBytesFromInputStream(InputStream in) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    byte[] buf = new byte[4096];
+    while(true) {
+      int n = in.read(buf);
+      if( n < 0 ) break;
+      baos.write(buf,0,n);
+    }
+
+    byte data[] = baos.toByteArray();
+    return data; 
+  }
+  
+  
   void handleTransaction(Socket s) {
     try (InputStream in = s.getInputStream();
-        OutputStream out = s.getOutputStream();
-        Scanner scanner = new Scanner(in);) {
+        OutputStream out = s.getOutputStream();) {
       // Read encrypted input
-      Scanner sDelim = scanner.useDelimiter("\\A");
-      String encrypted = sDelim.hasNext() ? sDelim.next() : "";
+      
+      byte[] inputData = getBytesFromInputStream(in); 
+      System.out.println(new String(inputData));
+      System.out.println(inputData.length);
+      System.out.flush(); 
       // Decrypt into a transaction request
-      String decrypted = encryption.decrypt(encrypted, this.bankKey);
+      byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
       AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
       TransactionResponse tr = am.apply(t);
-      encrypted = encryption.encrypt(this.mapper.writeValueAsString(tr), this.bankKey);
-      out.write(encrypted.getBytes());
+      byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
+      out.write(toSend);
     } catch (EncryptionException | IOException e) {
       // Note: On an encryption/decription/or IO exception, no response is written out. Improve?
       // TODO

@@ -12,9 +12,9 @@ public class EncryptionTest {
     AESEncryption enc = new AESEncryption(); 
     EncryptionPair<SecretKey, SecretKey> p = enc.generateKey(); 
     String message = "Secret Message"; 
-    String ct = enc.encrypt(message, p.getEncryptionKey()); 
-    String pt = enc.decrypt(ct, p.getDecryptionKey()); 
-    assertEquals(message,pt); 
+    byte[] ct = enc.encrypt(message.getBytes(), p.getEncryptionKey()); 
+    byte[] pt = enc.decrypt(ct, p.getDecryptionKey()); 
+    assertEquals(message,new String(pt)); 
   }
   
   @Test

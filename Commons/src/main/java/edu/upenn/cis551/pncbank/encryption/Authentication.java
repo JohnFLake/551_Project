@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -80,15 +83,13 @@ public class Authentication {
       throw new IOException("Auth file of that name already exists.");
     }
 
-    try (Writer writer = new BufferedWriter(new FileWriter(filename))) {
-      String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
-      writer.write(encodedKey);
-      writer.flush();
-    } catch (IOException e) {
-      throw e;
-    }
+    
+    String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
+    Path path = Paths.get(filename);
+    Files.write(path, encodedKey.getBytes());
+     
 
-    return key;
+    return key; 
   }
 
   /**
@@ -100,23 +101,11 @@ public class Authentication {
   public static SecretKey getAESKeyFromAuthFile(String filename) throws Exception {
     String keyString;
 
-    // Read base64 key string from the given file
-    try {
-      BufferedReader br = new BufferedReader(new FileReader(filename));
-      StringBuilder sb = new StringBuilder();
-      String line = br.readLine();
-      while (line != null) {
-        sb.append(line);
-        line = br.readLine();
-      }
-      keyString = sb.toString();
-      br.close();
-    } catch (FileNotFoundException e) {
-      throw e;
-    }
+    Path path = Paths.get(filename);
+    byte[] data = Files.readAllBytes(path);
 
     // Take the string and convert it to a secret key.
-    byte[] key = Base64.getDecoder().decode(keyString.getBytes());
+    byte[] key = Base64.getDecoder().decode(data);
     // rebuild key using SecretKeySpec
     SecretKey aesKey = new SecretKeySpec(key, 0, key.length, "AES");
     return aesKey;

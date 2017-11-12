@@ -12,12 +12,11 @@ public class AESEncryption implements IEncryption<SecretKey, SecretKey> {
    * AES Encryption
    */
   @Override
-  public String encrypt(String plaintext, SecretKey key) throws EncryptionException {
+  public byte[] encrypt(byte[] plaintext, SecretKey key) throws EncryptionException {
     try {
       Cipher c = Cipher.getInstance("AES");
       c.init(Cipher.ENCRYPT_MODE, key);
-      byte[] enc = c.doFinal(plaintext.getBytes());
-      return Base64.getEncoder().encodeToString(enc);
+      return c.doFinal(plaintext);
     } catch (Exception e) {
       throw new EncryptionException(e.getMessage(), null);
     }
@@ -28,13 +27,11 @@ public class AESEncryption implements IEncryption<SecretKey, SecretKey> {
    * AES Decryption
    */
   @Override
-  public String decrypt(String ciphertext, SecretKey key) throws EncryptionException {
+  public byte[] decrypt(byte[] ciphertext, SecretKey key) throws EncryptionException {
     try {
       Cipher c = Cipher.getInstance("AES");
       c.init(Cipher.DECRYPT_MODE, key);
-      byte[] cipherBytes = Base64.getDecoder().decode(ciphertext);
-      String pt = new String(c.doFinal(cipherBytes));
-      return pt;
+      return c.doFinal(ciphertext);
     } catch (Exception e) {
       throw new EncryptionException(e.getMessage(), null);
     }
