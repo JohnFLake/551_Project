@@ -3,6 +3,7 @@ package edu.upenn.cis551.pncbank;
 import org.apache.commons.cli.*;
 
 import edu.upenn.cis551.pncbank.encryption.Authentication;
+import edu.upenn.cis551.pncbank.encryption.CardFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,7 +56,7 @@ public class Atm {
 
 	public static boolean properTransaction(CommandLine cmd)
 	{
-		if(!cmd.hasOption("n") || !cmd.hasOption("d") || !cmd.hasOption("w") || !cmd.hasOption("g"))
+		if(!cmd.hasOption("n") && !cmd.hasOption("d") && !cmd.hasOption("w") && !cmd.hasOption("g"))
 		{
 			return false;	
 		}
@@ -93,46 +94,56 @@ public class Atm {
 
 		return true;
 	}
+	
+	public static void lengthChecker(String input) {
+		if(input != null) {
+		if(input.length() > 4096) {
+			System.exit(255);
+		}
+	}
+	}
+	
+	public static void checkIP(String IP) {
+		char[] chars = IP.toCharArray();
+		String section = null;
+		int j = 0;
+		
+		for(int i = 0; i < IP.length(); i++) {
+			if(chars[i] == '.') {
+				if(Integer.parseInt(section) > 255) {
+					System.exit(255);
+				}
+				
+				else {
+					section = "";
+					j++;
+					if(j > 3) {
+						break;
+					}
+				}
+			}		
+			section += chars[i];
+		}
+	}
 
 
-	public static String cardFile(CommandLine cmd)
+	public static void cardFile(CommandLine cmd)
 	{
 		if(cmd.hasOption("a")) {
-			String accountName = cmd.getOptionValue("a");
-			String cardFile = accountName + ".card";
+			if(!(new File(cmd.getOptionValue("a")+".card")).exists())
+			{
+				try {
+					Authentication.saveCardFile(cmd.getOptionValue("a")+".card", new CardFile(cmd.getOptionValue("a")));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 
 		else {
 			System.exit(255);
 		}
-
-		return cardFile;
-	}
-
-
-	public static SecretKey authKey(String authFile) {
-		SecretKey authKey = null;
-
-		if(!(new File(authFile+".auth")).exists())
-		{
-			try {
-				authKey = Authentication.generateAuthFile(authFile+".auth");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		else {
-			try {
-				authKey = Authentication.getAESKeyFromAuthFile(authFile + ".auth");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		return authKey;
 	}
 }	
   

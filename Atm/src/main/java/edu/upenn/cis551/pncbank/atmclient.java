@@ -37,15 +37,15 @@ public class atmclient {
 		File checkcard = new File(accountName + ".card");
 		CardFile newCard = null;
 
-		if(checkcard.exists())
-		{
-			System.exit(255);
-		}
+		//if(checkcard.exists())
+		//{
+		//	System.exit(255);
+		//}
 
-		else
-		{
+		//else
+		//{
 			newCard = new CardFile(accountName+".card");
-		}
+		//}
 
 		Object send = new CreateAccountPOJO(accountName,newCard.getPin(),balance,newCard.getSequenceNumber());
 		String sendstring = objectMapper.writeValueAsString(send);
