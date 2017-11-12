@@ -63,6 +63,7 @@ public class atmclient {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(63);
 			}
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -110,9 +111,14 @@ public class atmclient {
 				{
 					System.exit(255);
 				}
+				
+				else {
+					newCard.setSequenceNumber(tResponse.getSequence());
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(63);
 			}
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -161,9 +167,14 @@ public class atmclient {
 				{
 					System.exit(255);
 				}
+				
+				else {
+					newCard.setSequenceNumber(tResponse.getSequence());
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(63);
 			}
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -210,9 +221,14 @@ public class atmclient {
 				{
 					System.exit(255);
 				}
+				
+				else {
+					newCard.setSequenceNumber(bResponse.getSequence());
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(63);
 			}
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

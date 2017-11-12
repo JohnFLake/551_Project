@@ -7,7 +7,7 @@ public class CardFile {
   
   private String pin; 
   private String accountName; 
-  private int sequenceNumber; 
+  private long sequenceNumber; 
   
   public CardFile() {
     pin = UUID.randomUUID().toString(); 
@@ -39,12 +39,12 @@ public class CardFile {
   }
 
 
-  public int getSequenceNumber() {
+  public long getSequenceNumber() {
     return sequenceNumber;
   }
 
 
-  public void setSequenceNumber(int sequenceNumber) {
+  public void setSequenceNumber(long sequenceNumber) {
     this.sequenceNumber = sequenceNumber;
   }
   
