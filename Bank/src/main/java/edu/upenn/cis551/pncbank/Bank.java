@@ -1,81 +1,139 @@
 package edu.upenn.cis551.pncbank;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis551.pncbank.bank.AccountManager;
-import edu.upenn.cis551.pncbank.bank.atmservice.AtmService;
+import edu.upenn.cis551.pncbank.encryption.AESEncryption;
+import edu.upenn.cis551.pncbank.encryption.Authentication;
+import edu.upenn.cis551.pncbank.encryption.EncryptionException;
+import edu.upenn.cis551.pncbank.encryption.IEncryption;
+import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
+import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 
-public class Bank {
+public class Bank implements AutoCloseable {
 
   public static final String DEFAULT_BANK_AUTH = "bank.auth";
   public static final String DEFAULT_BANK_PORT = "3000";
+  static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption();
+
+  private final int port;
+  private final SecretKey bankKey;
+  private final AccountManager am;
+  private final ObjectMapper mapper;
+  private boolean notShutdown = true;
+
+  /**
+   * Construct a bank
+   * 
+   * @param port The port on which to listen
+   * @param bankKey The bank key to use for all communcation
+   * @param am The Account Manager, including all bank state
+   */
+  Bank(int port, SecretKey bankKey, AccountManager am) {
+    this.port = port;
+    this.bankKey = bankKey;
+    this.am = am;
+    this.mapper = new ObjectMapper();
+    this.notShutdown = true;
+  }
+
+  void start() throws IOException {
+    while (true) {
+      // TODO if the server socket dies, reinitialize?
+      try (ServerSocket sSocket = new ServerSocket(this.port)) {
+        while (this.notShutdown) {
+          handleTransaction(sSocket.accept());
+        }
+      }
+    }
+  }
+
+
+  byte[] getBytesFromInputStream(InputStream in) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    byte[] buf = new byte[4096];
+    while (true) {
+      int n = in.read(buf);
+      if (n < 0)
+        break;
+      baos.write(buf, 0, n);
+    }
+
+    byte data[] = baos.toByteArray();
+    return data;
+  }
+
+
+  void handleTransaction(Socket s) {
+    try (InputStream in = s.getInputStream(); OutputStream out = s.getOutputStream();) {
+      // Read encrypted input
+
+      byte[] inputData = getBytesFromInputStream(in);
+      System.out.println(new String(inputData));
+      System.out.println(inputData.length);
+      System.out.flush();
+      // Decrypt into a transaction request
+      byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
+      AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
+      TransactionResponse tr = am.apply(t);
+      byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
+      out.write(toSend);
+    } catch (EncryptionException | IOException e) {
+      // Note: On an encryption/decription/or IO exception, no response is written out. Improve?
+      // TODO
+      e.printStackTrace();
+    }
+  }
 
   public static void main(String[] args) {
-    // Extract arguments
-    Options o = new Options();
-    o.addOption("p", true, "The port for this server to run on");
-    o.addOption("s", true, "The name of the auth file");
-
-    CommandLineParser clp = new DefaultParser();
     String authFileName;
     int bankPort;
+    SecretKey bankKey;
+
+    // Get necessary info to start a bank.
     try {
+      CommandLineParser clp = new DefaultParser();
+      Options o = new Options();
+      o.addOption("p", true, "The port for this server to run on");
+      o.addOption("s", true, "The name of the auth file");
       CommandLine cl = clp.parse(o, args);
       authFileName = cl.getOptionValue("s", DEFAULT_BANK_AUTH);
       bankPort = Integer.parseInt(cl.getOptionValue("p", DEFAULT_BANK_PORT), 10);
-    } catch (ParseException | NumberFormatException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      System.exit(255);
-      return;
-    }
-    File authFile = new File(authFileName);
-    try {
-      if (!authFile.createNewFile()) {
-        // File already existed
-        System.exit(255);
-        return;
-      }
-
-
-    } catch (IOException e) {
-      // Failed to create or write to the file
-      System.exit(255);
-      return;
-    }
-
-    String aesKey = "hello"; // TODO replace with actual generated AES key
-
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(authFile))) {
-      writer.write(aesKey);
-      System.out.println("created");
-    } catch (Exception e) {
-      // Failed to generate or write the AES key
+      bankKey = Authentication.generateAuthFile(authFileName);
+      System.out.println("Created");
+    } catch (ParseException | NumberFormatException | EncryptionException | IOException e) {
+      // Failed to parse args or to generate the authfile.
       System.exit(255);
       return;
     }
 
     // Set up the AtmService
     AccountManager am = new AccountManager();
-    AtmService service;
-    try {
-      service = new AtmService(bankPort, aesKey);
-    } catch (IOException e) {
-      // Failed to bind to the port
+
+    try (Bank bank = new Bank(bankPort, bankKey, am)) {
+      bank.start();
+    } catch (IOException e1) {
+      // Failed to bind to the specified port
       System.exit(255);
       return;
     }
-    // Main atm servicing loop
-    while (true) {
-      service.handleNextRequest(am);
-    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    this.notShutdown = false;
   }
 
 }

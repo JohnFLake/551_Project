@@ -1,12 +1,8 @@
 package edu.upenn.cis551.pncbank.encryption;
 
 import static org.junit.Assert.*;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Base64;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import org.junit.Test;
 
 public class EncryptionTest {
@@ -14,11 +10,11 @@ public class EncryptionTest {
   @Test
   public void testAESEncryptDecrypt() throws Exception{
     AESEncryption enc = new AESEncryption(); 
-    SecretKey k = enc.generateKey(); 
+    EncryptionPair<SecretKey, SecretKey> p = enc.generateKey(); 
     String message = "Secret Message"; 
-    String ct = enc.encrypt(message, k); 
-    String pt = enc.decrypt(ct, k); 
-    assertEquals(message,pt); 
+    byte[] ct = enc.encrypt(message.getBytes(), p.getEncryptionKey()); 
+    byte[] pt = enc.decrypt(ct, p.getDecryptionKey()); 
+    assertEquals(message,new String(pt)); 
   }
   
   @Test
