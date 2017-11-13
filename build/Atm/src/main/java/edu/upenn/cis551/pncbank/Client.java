@@ -3,15 +3,15 @@ package edu.upenn.cis551.pncbank;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import javax.crypto.SecretKey;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis551.pncbank.encryption.AESEncryption;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.CardFile;
+import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.BalancePOJO;
-import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.CreateAccountPOJO;
 import edu.upenn.cis551.pncbank.transaction.DepositPOJO;
 import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
@@ -20,76 +20,106 @@ import edu.upenn.cis551.pncbank.transaction.WithdrawPOJO;
 public class Client {
   static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption();
 
+  public static TransactionResponse sendPOJO(Object pojo, Session session) {
 
-  public static void newAccount(Session session, String accountName, int balance) throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();
     byte[] response = null;
     Socket AtmBank = null;
 
-    // TODO: explain this:
-    if (Integer.parseInt(Integer.toString(balance).substring(0, 1)) == 0) {
+    // Encrypt this POJO:
+    SecretKey encryptKey = session.getsecretkey();
+    byte[] encrypted = null;
+    try {
+      encrypted = encryption.encrypt(objectMapper.writeValueAsBytes(pojo), encryptKey);
+    } catch (JsonProcessingException | EncryptionException e1) {
       System.exit(255);
     }
 
+    try {
+      AtmBank = new Socket(session.getIP(), session.getPort());
+
+      // Timeout is 10 seconds
+      AtmBank.setSoTimeout(10 * 1000);
+
+      // Send the encrypted bytes and receive a response:
+      response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
+
+      // The response is encrypted. we need to decrypt it.
+      byte[] decryptedResponse = null;
+
+      // Encryption error has it's own exit code
+      try {
+        decryptedResponse = encryption.decrypt(response, encryptKey);
+      } catch (EncryptionException e) {
+        System.exit(255);
+      }
+
+      TransactionResponse tResponse =
+          objectMapper.readValue(decryptedResponse, TransactionResponse.class);
+      if (tResponse == null || !tResponse.isOk()) {
+        System.exit(255);
+      }
+      return tResponse;
+
+    } catch (IOException e) {
+      // ERROR with connection, including timeout.
+      System.err.println("Error with the socket: " + e.getMessage());
+      System.exit(63);
+    }
+    return null;
+  }
+
+
+  /**
+   * Update the seq number of a card file.
+   * 
+   * @param card
+   * @param cardName
+   * @param seq
+   */
+  public static void updateCardSeqNumber(CardFile card, String cardName, long seq) {
+    card.setSequenceNumber(seq);
+    try {
+      Authentication.saveCardFile(cardName, card);
+    } catch (Exception e) {
+      System.exit(255);
+    }
+  }
+
+
+  public static void newAccount(Session session, String accountName, int balance) {
     if (balance < 10) {
       System.exit(255);
     }
 
     // Make a new cardfile
     CardFile newCard = new CardFile(accountName);
-    Authentication.saveCardFile(session.getCard(), newCard);
+    try {
+      Authentication.saveCardFile(session.getCard(), newCard);
+    } catch (Exception e1) {
+      System.exit(255);
+    }
 
 
-    Object send =
+    // Make pojo to send.
+    Object pojo =
         new CreateAccountPOJO(accountName, newCard.getPin(), balance, newCard.getSequenceNumber());
 
-    try {
-      AtmBank = new Socket(session.getIP(), session.getPort());
-      try {
 
-        // Encrypt this POJO:
-        SecretKey encryptKey = session.getsecretkey();
-        byte[] encrypted = encryption.encrypt(objectMapper.writeValueAsBytes(send), encryptKey);
+    // Send pojo and get response. Print it.
+    TransactionResponse tResponse = sendPOJO(pojo, session);
+    System.out.println(tResponse.toString());
 
-        // Send the encrypted bytes and receive a response:
-        response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
-
-        // The response is encrypted. we need to decrypt it.
-        byte[] decryptedResponse = encryption.decrypt(response, encryptKey);
-
-        TransactionResponse tResponse =
-            objectMapper.readValue(decryptedResponse, TransactionResponse.class);
-        // Print response:
-        System.out.println(objectMapper.writeValueAsString(tResponse));
-        if (!tResponse.isOk()) {
-          System.exit(255);
-        }
-
-        // Update the sequence number:
-        if (newCard.getSequenceNumber() == tResponse.getSequence()) {
-          newCard.setSequenceNumber(tResponse.getSequence() + 1);
-          Authentication.saveCardFile(session.getCard(), newCard);
-        } else {
-          System.exit(255);
-        }
-
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        System.exit(63);
-      }
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    // Update sequence number
+    if (newCard.getSequenceNumber() == tResponse.getSequence()) {
+      updateCardSeqNumber(newCard, session.getCard(), tResponse.getSequence() + 1);
+    } else {
+      System.exit(255);
     }
   }
 
 
   public static void Deposit(Session session, String accountName, int deposit) throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    byte[] response = null;
-    Socket AtmBank = null;
 
     // Check on the proper formatting of this
     File cardFile = new File(session.getCard());
@@ -99,63 +129,26 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object send =
+    Object pojo =
         new DepositPOJO(accountName, checkCard.getPin(), deposit, checkCard.getSequenceNumber());
 
-    try {
-      AtmBank = new Socket(session.getIP(), session.getPort());
-      try {
-
-        // Encrypt this POJO:
-        SecretKey encryptKey = session.getsecretkey();
-        byte[] encrypted = encryption.encrypt(objectMapper.writeValueAsBytes(send), encryptKey);
-        response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
-
-
-        // The response is encrypted. we need to decrypt it.
-        byte[] decryptedResponse = encryption.decrypt(response, encryptKey);
-
-
-        TransactionResponse tResponse =
-            objectMapper.readValue(decryptedResponse, TransactionResponse.class);
-        // Print response:
-        System.out.println(objectMapper.writeValueAsString(tResponse));
-        if (!tResponse.isOk()) {
-          System.exit(255);
-        }
-
-        if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
-          checkCard.setSequenceNumber(tResponse.getSequence() + 1);
-          Authentication.saveCardFile(session.getCard(), checkCard);
-        } else {
-          System.exit(255);
-        }
-
-      } catch (Exception e) {
-        e.printStackTrace();
-        System.exit(63);
-      }
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    // Send pojo and get response. Print it.
+    TransactionResponse tResponse = sendPOJO(pojo, session);
+    // Update sequence number
+    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
+      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
+    } else {
+      System.exit(255);
     }
   }
 
 
 
   public static void Withdraw(Session session, String accountName, int withdraw) throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    byte[] response = null;
-    Socket AtmBank = null;
-
     if (withdraw < 0) {
       System.exit(255);
     }
 
-    // Check on the proper formatting of this
     File cardFile = new File(session.getCard());
     if (!cardFile.exists()) {
       System.exit(255);
@@ -163,48 +156,16 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object send =
+    Object pojo =
         new WithdrawPOJO(accountName, checkCard.getPin(), withdraw, checkCard.getSequenceNumber());
 
-
-    try {
-      AtmBank = new Socket(session.getIP(), session.getPort());
-      try {
-        // Encrypt this POJO:
-        SecretKey encryptKey = session.getsecretkey();
-        byte[] encrypted = encryption.encrypt(objectMapper.writeValueAsBytes(send), encryptKey);
-        response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
-
-        // The response is encrypted. we need to decrypt it.
-        byte[] decryptedResponse = encryption.decrypt(response, encryptKey);
-
-        TransactionResponse tResponse =
-            objectMapper.readValue(decryptedResponse, TransactionResponse.class);
-        // Print response:
-        System.out.println(objectMapper.writeValueAsString(tResponse));
-        if (!tResponse.isOk()) {
-          System.exit(255);
-        }
-
-        if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
-          checkCard.setSequenceNumber(tResponse.getSequence() + 1);
-          Authentication.saveCardFile(session.getCard(), checkCard);
-        } else {
-          System.exit(255);
-        }
-
-
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        System.exit(63);
-      }
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    // Send pojo and get response. Print it.
+    TransactionResponse tResponse = sendPOJO(pojo, session);
+    // Update sequence number
+    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
+      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
+    } else {
+      System.exit(255);
     }
 
   }
@@ -212,11 +173,6 @@ public class Client {
 
 
   public static void checkBalance(Session session, String accountName) throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    byte[] response = null;
-    Socket AtmBank = null;
-
-
     File cardFile = new File(session.getCard());
     if (!cardFile.exists()) {
       System.exit(255);
@@ -224,48 +180,15 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object send = new BalancePOJO(accountName, checkCard.getPin(), checkCard.getSequenceNumber());
+    Object pojo = new BalancePOJO(accountName, checkCard.getPin(), checkCard.getSequenceNumber());
 
-
-    try {
-      AtmBank = new Socket(session.getIP(), session.getPort());
-      try {
-        // Encrypt this POJO:
-        SecretKey encryptKey = session.getsecretkey();
-        byte[] encrypted = encryption.encrypt(objectMapper.writeValueAsBytes(send), encryptKey);
-        response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
-
-
-        // The response is encrypted. we need to decrypt it.
-        byte[] decryptedResponse = encryption.decrypt(response, encryptKey);
-
-
-        BalanceResponse bResponse =
-            objectMapper.readValue(decryptedResponse, BalanceResponse.class);
-        // Print response:
-        System.out.println(objectMapper.writeValueAsString(bResponse));
-        if (!bResponse.isOk()) {
-          System.exit(255);
-        }
-
-        if (checkCard.getSequenceNumber() == bResponse.getSequence()) {
-          checkCard.setSequenceNumber(bResponse.getSequence() + 1);
-          Authentication.saveCardFile(session.getCard(), checkCard);
-        } else {
-          System.exit(255);
-        }
-
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        System.exit(63);
-      }
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    // Send pojo and get response. Print it.
+    TransactionResponse tResponse = sendPOJO(pojo, session);
+    // Update sequence number
+    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
+      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
+    } else {
+      System.exit(255);
     }
   }
 }

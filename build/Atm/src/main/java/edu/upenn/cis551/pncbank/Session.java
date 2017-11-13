@@ -49,7 +49,7 @@ public class Session {
    * @return
    * @throws Exception
    */
-  public static byte[] writeToAndReadFromSocket(Socket socket, byte[] writeTo) throws Exception {
+  public static byte[] writeToAndReadFromSocket(Socket socket, byte[] writeTo) throws IOException {
     try (OutputStream os = socket.getOutputStream()) {
 
       // write raw bytes to socket.
@@ -72,7 +72,6 @@ public class Session {
       return result;
 
     } catch (IOException e) {
-      e.printStackTrace();
       throw e;
     }
   }

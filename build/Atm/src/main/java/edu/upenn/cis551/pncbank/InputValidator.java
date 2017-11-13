@@ -59,7 +59,7 @@ public class InputValidator {
     if (str == null) {
       return false;
     }
-    if (argTooLong(str)) {
+    if (str.length() < 1 || str.length() > 205) {
       return false;
     }
 
@@ -164,20 +164,26 @@ public class InputValidator {
    * @return
    */
   public static boolean isValidIP(String str) {
-
-    final String ip_pattern =
-        "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-            + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-
     if (str == null) {
       return false;
     }
     if (argTooLong(str)) {
       return false;
     }
-    if (!str.matches(ip_pattern)) {
-      return false;
+
+    String[] tokens = str.split("\\.");
+    for (String tok : tokens) {
+      if (!tok.matches("(0|[1-9][0-9]*)")) {
+        return false;
+      } else {
+        int n = Integer.parseInt(tok);
+        if (n < 0 || n > 255)
+          return false;
+      }
     }
+
+
+
     return true;
   }
 }
