@@ -107,6 +107,6 @@
 		</plugins>
 	</build>
 	<properties>
-		<buildDir>../build</buildDir>
+		<buildDir>../../build</buildDir>
 	</properties>
 </project>
