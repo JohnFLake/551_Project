@@ -55,6 +55,7 @@ public class Bank implements AutoCloseable {
         while (this.notShutdown) {
           handleTransaction(sSocket.accept());
         }
+        break;
       }
     }
   }

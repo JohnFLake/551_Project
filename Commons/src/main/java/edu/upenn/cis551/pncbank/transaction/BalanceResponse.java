@@ -6,6 +6,14 @@ public class BalanceResponse extends TransactionResponse {
    */
   String balance;
 
+  /**
+   * Private constructor for use with Jackson.
+   */
+  @SuppressWarnings("unused")
+  private BalanceResponse() {
+    super();
+  }
+
   public BalanceResponse(boolean ok, String accountId, long sequence, String balance) {
     super(ok, accountId, sequence);
     this.balance = balance;

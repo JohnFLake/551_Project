@@ -1,13 +1,10 @@
 package edu.upenn.cis551.pncbank.encryption;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,13 +80,13 @@ public class Authentication {
       throw new IOException("Auth file of that name already exists.");
     }
 
-    
+
     String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
     Path path = Paths.get(filename);
     Files.write(path, encodedKey.getBytes());
-     
 
-    return key; 
+
+    return key;
   }
 
   /**
@@ -99,7 +96,6 @@ public class Authentication {
    * @return
    */
   public static SecretKey getAESKeyFromAuthFile(String filename) throws Exception {
-    String keyString;
 
     Path path = Paths.get(filename);
     byte[] data = Files.readAllBytes(path);
