@@ -18,8 +18,8 @@ public class Account {
   String cardValidator;
   long sequence;
 
-  public Account(long balance, String validator, long sequence) {
-    this.balance = BigInteger.valueOf(balance);
+  public Account(String validator, long sequence) {
+    this.balance = BigInteger.ZERO;
     this.cardValidator = validator;
     this.sequence = sequence;
   }
@@ -53,7 +53,7 @@ public class Account {
    * @param delta The change to make on the account value
    * @return false iff the amount results in a negative balance.
    */
-  boolean updateValue(long delta) {
+  boolean updateValueAndIncrementSeq(long delta) {
     BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
     if (newVal.compareTo(BigInteger.ZERO) < 0) {
       return false;
