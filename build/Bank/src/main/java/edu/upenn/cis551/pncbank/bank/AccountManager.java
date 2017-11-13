@@ -39,7 +39,7 @@ public class AccountManager {
       DepositPOJO request = (DepositPOJO) t;
       Account a = this.accounts.get(accountId);
 
-      if (null == a || a.getCardValidator() != request.getValidation()) {
+      if (null == a || !a.getCardValidator().equals(request.getValidation())) {
         return new TransactionResponse(false, accountId, request.getSequenceNumber());
       }
       long deposit = request.getDeposit();
