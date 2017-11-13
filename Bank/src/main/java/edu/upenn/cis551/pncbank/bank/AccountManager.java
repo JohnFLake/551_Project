@@ -2,6 +2,7 @@ package edu.upenn.cis551.pncbank.bank;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
 import edu.upenn.cis551.pncbank.transaction.BalancePOJO;
 import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
@@ -26,54 +27,58 @@ public class AccountManager {
    */
   public TransactionResponse apply(AbstractTransaction t) {
     String accountId = t.getAccountName();
-    long sequence = t.getSequenceNumber();
 
     if (t instanceof CreateAccountPOJO) {
       CreateAccountPOJO request = (CreateAccountPOJO) t;
-      long balance = request.getBalance();
-      String validator = request.getValidator();
-      return new TransactionResponse(createAccount(accountId, validator,
-          // sequence + 1 since the next request will be with the next number.
-          sequence + 1, balance), accountId, sequence);
+      return createAccount(accountId, request.getValidator(), request.getSequenceNumber(),
+          request.getBalance())
+              .map(acct -> new TransactionResponse(true, accountId, request.getSequenceNumber()))
+              .orElse(new TransactionResponse(false, accountId, request.getSequenceNumber()));
 
     } else if (t instanceof DepositPOJO) {
-      Account a = this.accounts.get(accountId);
-      if (null == a) {
-        return new TransactionResponse(false, accountId, sequence);
-      }
       DepositPOJO request = (DepositPOJO) t;
-      long deposit = request.getDeposit();
-      if (deposit < 0) {
-        return new TransactionResponse(false, accountId, sequence);
+      Account a = this.accounts.get(accountId);
+
+      if (null == a || a.getCardValidator() != request.getValidation()) {
+        return new TransactionResponse(false, accountId, request.getSequenceNumber());
       }
-      String validation = request.getValidation();
-      return new TransactionResponse(changeValue(a, validation, deposit, sequence),
-          accountId, sequence);
+      long deposit = request.getDeposit();
+      if (a.getSequence() != request.getSequenceNumber() || deposit < 0) {
+        // Tell the atm the next sequence number only if validation passed.
+        return new TransactionResponse(false, accountId, a.getSequence());
+      }
+
+      return new TransactionResponse(a.updateValueAndIncrementSeq(deposit), accountId,
+          request.getSequenceNumber());
 
     } else if (t instanceof WithdrawPOJO) {
-      Account a = this.accounts.get(accountId);
-      if (null == a) {
-        return new TransactionResponse(false, accountId, sequence);
-      }
       WithdrawPOJO request = (WithdrawPOJO) t;
-      String validation = request.getValidation();
-      long withdrawl = request.getWithdraw();
-      if (withdrawl < 0) {
-        return new TransactionResponse(false, accountId, sequence);
-      }
-      return new TransactionResponse(changeValue(a, validation, -1 * withdrawl, sequence),
-          accountId, sequence);
-    } else if (t instanceof BalancePOJO) {
       Account a = this.accounts.get(accountId);
-      if (null == a) {
-        return new TransactionResponse(false, accountId, sequence);
+
+      if (null == a || !a.getCardValidator().equals(request.getValidation())) {
+        return new TransactionResponse(false, accountId, request.getSequenceNumber());
       }
+
+      long withdrawl = request.getWithdraw();
+      if (a.getSequence() != request.getSequenceNumber() || withdrawl < 0) {
+        return new TransactionResponse(false, accountId, a.getSequence());
+      }
+      return new TransactionResponse(a.updateValueAndIncrementSeq(-1 * withdrawl), accountId,
+          request.getSequenceNumber());
+    } else if (t instanceof BalancePOJO) {
       BalancePOJO request = (BalancePOJO) t;
-      String validation = request.getValidation();
-      if(!checkSequenceValidation(a, validation, sequence)) {
-        return new TransactionResponse(false, accountId, sequence);
+      Account a = this.accounts.get(accountId);
+
+      if (null == a || !a.getCardValidator().equals(request.getValidation())) {
+        return new TransactionResponse(false, accountId, request.getSequenceNumber());
       }
-      return new BalanceResponse(true, accountId, sequence, a.readValueTransaction());
+
+      if (a.getSequence() != request.getSequenceNumber()) {
+        return new TransactionResponse(false, accountId, a.getSequence());
+      }
+
+      return new BalanceResponse(true, accountId, request.getSequenceNumber(),
+          a.readValueTransaction());
     }
     return null;
   }
@@ -84,17 +89,19 @@ public class AccountManager {
    * 
    * @param accountId
    * @param validator
-   * @param nextSequence The next sequence number that this account should expect
+   * @param sequence The sequence number given in the create request
    * @param balance
-   * @return <code>true</code> unless an account exists with that name.
+   * @return An Optional with an account. One will be present if creating an account succeeds.
    */
-  public synchronized boolean createAccount(String accountId, String validator, long nextSequence,
-      long balance) {
-    if (this.accounts.containsKey(accountId) || balance < 0l) {
-      return false;
+  public synchronized Optional<Account> createAccount(String accountId, String validator,
+      long sequence, long balance) {
+    if (this.accounts.containsKey(accountId) || balance < 0l || null == validator) {
+      return Optional.empty();
     } else {
-      this.accounts.put(accountId, new Account(balance, validator, nextSequence));
-      return true;
+      Account result = new Account(validator, sequence);
+      result.updateValueAndIncrementSeq(balance);
+      this.accounts.put(accountId, result);
+      return Optional.of(result);
     }
   }
 
@@ -102,7 +109,7 @@ public class AccountManager {
     if (null == a || !checkSequenceValidation(a, validation, sequence)) {
       return false;
     }
-    return a.updateValue(delta);
+    return a.updateValueAndIncrementSeq(delta);
   }
 
   public boolean checkSequenceValidation(Account a, String validation, long sequence) {

@@ -52,7 +52,10 @@ public class AccountManagerTest {
     long newSequence = 12345;
     long oldSequence = 6789123;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, oldValidator, oldSequence));
+    Account a = new Account(oldValidator, oldSequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    oldSequence++;
+    test.accounts.put("test", a);
     CreateAccountPOJO create =
         new CreateAccountPOJO(accountName, newValidator, newInitialBalance, newSequence);
 
@@ -62,7 +65,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(oldSequence, a.sequence);
     Assert.assertEquals(oldValidator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
@@ -108,7 +110,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = 100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     DepositPOJO deposit = new DepositPOJO(accountName, validator, amount, sequence);
 
     // Run
@@ -117,7 +122,6 @@ public class AccountManagerTest {
     // Verify
     // State is changed
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence + 1, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance + amount), a.balance);
@@ -159,9 +163,12 @@ public class AccountManagerTest {
     String validator = "validator";
     long oldBalance = 1000000;
     long reqSequence = 12346123;
-    long expectedSequence = 12345;
+    long accountSequence = 12345;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, expectedSequence));
+    Account a = new Account(validator, accountSequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    accountSequence++;
+    test.accounts.put("test", a);
     DepositPOJO deposit = new DepositPOJO(accountName, validator, 100, reqSequence);
 
     // Run
@@ -170,15 +177,14 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
-    Assert.assertEquals(expectedSequence, a.sequence);
+    Assert.assertEquals(accountSequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
 
     // Response is correct
     Assert.assertNotNull(t);
     Assert.assertEquals(accountName, t.getAccountId());
-    Assert.assertEquals(reqSequence, t.getSequence());
+    Assert.assertEquals(accountSequence, t.getSequence());// Tell the atm the right sequence number
     Assert.assertFalse(t.isOk());
   }
 
@@ -192,7 +198,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = 100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     DepositPOJO deposit = new DepositPOJO(accountName, validator2, amount, sequence);
 
     // Run
@@ -201,7 +210,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
@@ -219,12 +227,14 @@ public class AccountManagerTest {
     String accountName = "test";
     String validator = "validator";
     long balance = 1000000;
-    long newSequence = 12346;
-    long oldSequence = 12345;
+    long sequence = 12345;
     long amount = -1;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(balance, validator, oldSequence));
-    DepositPOJO deposit = new DepositPOJO(accountName, validator, amount, newSequence);
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(balance);
+    sequence++;
+    test.accounts.put("test", a);
+    DepositPOJO deposit = new DepositPOJO(accountName, validator, amount, sequence);
 
     // Run
     TransactionResponse t = test.apply(deposit);
@@ -232,15 +242,14 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
-    Assert.assertEquals(oldSequence, a.sequence);
+    Assert.assertEquals(sequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(balance), a.balance);
 
     // Response is correct
     Assert.assertNotNull(t);
     Assert.assertEquals(accountName, t.getAccountId());
-    Assert.assertEquals(newSequence, t.getSequence());
+    Assert.assertEquals(sequence, t.getSequence());
     Assert.assertFalse(t.isOk());
   }
 
@@ -253,7 +262,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = 100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator, amount, sequence);
 
     // Run
@@ -262,7 +274,6 @@ public class AccountManagerTest {
     // Verify
     // State is changed
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence + 1, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance - amount), a.balance);
@@ -307,7 +318,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = -100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator, amount, sequence);
 
     // Run
@@ -316,7 +330,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
@@ -337,7 +350,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = oldBalance + 1;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator, amount, sequence);
 
     // Run
@@ -346,7 +362,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
@@ -368,7 +383,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long amount = 100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    sequence++;
+    test.accounts.put("test", a);
     WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator2, amount, sequence);
 
     // Run
@@ -377,7 +395,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
@@ -395,11 +412,14 @@ public class AccountManagerTest {
     String accountName = "test";
     String validator = "validator";
     long oldBalance = 1000000;
-    long expectedSequence = 12345;
+    long accountSequence = 12345;
     long reqSequence = 6834572;
     long amount = 100;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(oldBalance, validator, expectedSequence));
+    Account a = new Account(validator, accountSequence);
+    a.updateValueAndIncrementSeq(oldBalance);
+    accountSequence++;
+    test.accounts.put("test", a);
     WithdrawPOJO deposit = new WithdrawPOJO(accountName, validator, amount, reqSequence);
 
     // Run
@@ -408,15 +428,14 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
-    Assert.assertEquals(expectedSequence, a.sequence);
+    Assert.assertEquals(accountSequence, a.sequence);
     Assert.assertEquals(validator, a.cardValidator);
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.balance);
 
     // Response is correct
     Assert.assertNotNull(t);
     Assert.assertEquals(accountName, t.getAccountId());
-    Assert.assertEquals(reqSequence, t.getSequence());
+    Assert.assertEquals(accountSequence, t.getSequence());
     Assert.assertFalse(t.isOk());
   }
 
@@ -428,7 +447,10 @@ public class AccountManagerTest {
     long balance = 1000000;
     long sequence = 12345;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(balance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(balance);
+    sequence++;
+    test.accounts.put("test", a);
     BalancePOJO bal = new BalancePOJO(accountName, validator, sequence);
 
     // Run
@@ -437,7 +459,6 @@ public class AccountManagerTest {
     // Verify
     // State is changed (only sequence number)
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence + 1, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.balance);
@@ -483,7 +504,10 @@ public class AccountManagerTest {
     long sequence = 12345;
     long reqSequence = 63457234;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(balance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(balance);
+    sequence++;
+    test.accounts.put("test", a);
     BalancePOJO bal = new BalancePOJO(accountName, validator, reqSequence);
 
     // Run
@@ -492,7 +516,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.balance);
@@ -500,7 +523,7 @@ public class AccountManagerTest {
     // Response is correct
     Assert.assertFalse(t instanceof BalanceResponse);
     Assert.assertFalse(t.isOk());
-    Assert.assertEquals(reqSequence, t.getSequence());
+    Assert.assertEquals(sequence, t.getSequence()); // Tells the atm the correct sequence number
     Assert.assertEquals(accountName, t.getAccountId());
   }
 
@@ -513,7 +536,10 @@ public class AccountManagerTest {
     long balance = 1000000;
     long sequence = 12345;
     AccountManager test = new AccountManager();
-    test.accounts.put("test", new Account(balance, validator, sequence));
+    Account a = new Account(validator, sequence);
+    a.updateValueAndIncrementSeq(balance);
+    sequence++;
+    test.accounts.put("test", a);
     BalancePOJO bal = new BalancePOJO(accountName, validator2, sequence);
 
     // Run
@@ -522,7 +548,6 @@ public class AccountManagerTest {
     // Verify
     // State is unchanged
     Assert.assertTrue(test.accounts.containsKey(accountName));
-    Account a = test.accounts.get(accountName);
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.balance);
