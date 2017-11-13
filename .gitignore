@@ -2,8 +2,6 @@ bin/*
 build/bin/*
 build/makebin/*
 build/lib/*
-build/bank
-build/atm
 .DS_Store
 .settings/
 */.settings/
