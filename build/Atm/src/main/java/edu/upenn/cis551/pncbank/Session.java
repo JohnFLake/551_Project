@@ -8,16 +8,25 @@ import java.io.OutputStream;
 import java.net.Socket;
 import javax.crypto.SecretKey;
 
-public class atmSession {
-  private static String IP;
-  private static int port;
-  private static SecretKey auth;
+public class Session {
+  private String IP;
+  private int port;
+  private SecretKey auth;
+  private String card;
 
-  public atmSession(String IP, int port, SecretKey auth) {
+
+  public Session(String IP, int port, SecretKey auth, String c) {
     this.IP = IP;
     this.port = port;
     this.auth = auth;
+    this.card = c;
+
   }
+
+  public String getCard() {
+    return card;
+  }
+
 
   public String getIP() {
     return IP;
