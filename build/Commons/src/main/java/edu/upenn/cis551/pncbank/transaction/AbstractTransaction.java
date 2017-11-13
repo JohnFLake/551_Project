@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
     @Type(value = BalancePOJO.class)//
 })
 public abstract class AbstractTransaction {
+  static final long maxCurrencyValue = 429496729599l;
   long sequenceNumber;
   String accountName;
 

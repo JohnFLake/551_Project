@@ -1,5 +1,7 @@
 package edu.upenn.cis551.pncbank.transaction;
 
+import edu.upenn.cis551.pncbank.utils.PrintUtils;
+
 public class WithdrawPOJO extends AbstractTransaction {
 
   long withdraw;
@@ -27,6 +29,16 @@ public class WithdrawPOJO extends AbstractTransaction {
 
   public final String getValidation() {
     return this.validation;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    sb.append("\"account\":\"").append(this.getAccountName()).append("\",");
+    sb.append("\"withdraw\":").append(PrintUtils.writeCurrency(this.getWithdraw()));
+    sb.append('}');
+    return sb.toString();
   }
 
 }

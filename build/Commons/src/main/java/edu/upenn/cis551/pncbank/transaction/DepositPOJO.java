@@ -1,5 +1,7 @@
 package edu.upenn.cis551.pncbank.transaction;
 
+import edu.upenn.cis551.pncbank.utils.PrintUtils;
+
 public class DepositPOJO extends AbstractTransaction {
   long deposit;
   String validation;
@@ -23,5 +25,15 @@ public class DepositPOJO extends AbstractTransaction {
 
   public final String getValidation() {
     return this.validation;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    sb.append("\"account\":\"").append(this.getAccountName()).append("\",");
+    sb.append("\"deposit\":").append(PrintUtils.writeCurrency(this.getDeposit()));
+    sb.append('}');
+    return sb.toString();
   }
 }

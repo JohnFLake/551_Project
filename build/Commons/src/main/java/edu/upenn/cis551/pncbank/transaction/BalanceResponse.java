@@ -22,4 +22,14 @@ public class BalanceResponse extends TransactionResponse {
   public String getBalance() {
     return this.balance;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    sb.append("\"balance\":").append(this.getBalance()).append(',');
+    sb.append("\"account\":").append(this.getAccountId());
+    sb.append('}');
+    return sb.toString();
+  }
 }
