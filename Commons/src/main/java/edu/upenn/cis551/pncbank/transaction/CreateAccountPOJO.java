@@ -1,8 +1,15 @@
 package edu.upenn.cis551.pncbank.transaction;
 
 public class CreateAccountPOJO extends AbstractTransaction {
-  final long balance;
-  final String validator;
+  long balance;
+  String validator;
+
+  /**
+   * Private constructor for use with Jackson.
+   */
+  private CreateAccountPOJO() {
+    super(null, 0);
+  }
 
   public CreateAccountPOJO(String accountName, String validator, long balance,
       long sequenceNumber) {

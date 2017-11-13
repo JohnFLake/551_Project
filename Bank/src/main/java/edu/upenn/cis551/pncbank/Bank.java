@@ -55,6 +55,7 @@ public class Bank implements AutoCloseable {
         while (this.notShutdown) {
           handleTransaction(sSocket.accept());
         }
+        break;
       }
     }
   }
@@ -81,9 +82,6 @@ public class Bank implements AutoCloseable {
       // Read encrypted input
 
       byte[] inputData = getBytesFromInputStream(in);
-      System.out.println(new String(inputData));
-      System.out.println(inputData.length);
-      System.out.flush();
       // Decrypt into a transaction request
       byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
       AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
