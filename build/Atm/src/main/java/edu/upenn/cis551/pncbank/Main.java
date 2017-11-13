@@ -127,5 +127,6 @@ public class Main {
       System.exit(255);
     }
 
+    System.exit(0);
   }
 }

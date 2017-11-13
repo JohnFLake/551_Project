@@ -35,6 +35,12 @@ public class AtmTest {
     assertEquals(false, InputValidator.isValidIP(ip));
   }
 
+  @Test
+  public void testInvalidIP2() {
+    String ip = "004.131.100.134";
+    assertEquals(false, InputValidator.isValidIP(ip));
+  }
+
 
   @Test
   public void testValidIPLocal() {
@@ -47,6 +53,31 @@ public class AtmTest {
     String ip = "0.0.0.0";
     assertEquals(true, InputValidator.isValidIP(ip));
   }
+
+  @Test
+  public void testInvalidFileNameTooLong() {
+    StringBuilder file = new StringBuilder();
+    for (int i = 0; i < 206; i++)
+      file.append("");
+
+    assertEquals(false, InputValidator.isValidFile(file.toString()));
+  }
+
+  @Test
+  public void testValidFileNameLengthLimit() {
+    StringBuilder file = new StringBuilder();
+    for (int i = 0; i < 205; i++)
+      file.append("a");
+
+    assertEquals(true, InputValidator.isValidFile(file.toString()));
+  }
+
+  @Test
+  public void testValidAccountNamePeriod() {
+    String n = ".";
+    assertEquals(true, InputValidator.isValidAccountName(n));
+  }
+
 
 
 }
