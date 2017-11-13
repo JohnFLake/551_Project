@@ -66,26 +66,30 @@ public class Bank implements AutoCloseable {
     byte[] buf = new byte[4096];
     while (true) {
       int n = in.read(buf);
-      if (n < 0)
+      System.out.println("Buffer: " + new String(buf));
+      System.out.println("N: " + n);
+      if (n <= 0)
         break;
       baos.write(buf, 0, n);
     }
 
+
     byte data[] = baos.toByteArray();
+
+    System.out.println("Data length: " + data.length);
     return data;
   }
 
 
   void handleTransaction(Socket s) {
     try (InputStream in = s.getInputStream(); OutputStream out = s.getOutputStream();) {
-      // Read encrypted input
 
+      // Read encrypted input
       byte[] inputData = getBytesFromInputStream(in);
-      System.out.println(new String(inputData));
-      System.out.println(inputData.length);
-      System.out.flush();
+
       // Decrypt into a transaction request
       byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
+
       AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
       TransactionResponse tr = am.apply(t);
       byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);

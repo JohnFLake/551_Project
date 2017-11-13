@@ -1,6 +1,5 @@
 package edu.upenn.cis551.pncbank.encryption;
 
-import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -47,7 +46,7 @@ public class AESEncryption implements IEncryption<SecretKey, SecretKey> {
       KeyGenerator keygen = KeyGenerator.getInstance("AES");
       keygen.init(128);
       SecretKey sKey = keygen.generateKey();
-      return new EncryptionPair<SecretKey, SecretKey> (sKey, sKey);
+      return new EncryptionPair<SecretKey, SecretKey>(sKey, sKey);
     } catch (Exception e) {
       throw new EncryptionException(e.getMessage(), null);
     }
