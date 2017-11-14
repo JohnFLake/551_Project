@@ -2,13 +2,15 @@
 
 package edu.upenn.cis551.pncbank;
 
+import java.io.IOException;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
-import edu.upenn.cis551.pncbank.encryption.EncryptionException;
+import edu.upenn.cis551.pncbank.exception.NoRequestException;
 
 public class Main {
 
@@ -42,7 +44,8 @@ public class Main {
     authKey = null;
   }
 
-  public static CommandLine parseOptions(Options options, String[] args) throws Exception {
+  public static CommandLine parseOptions(Options options, String[] args)
+      throws ParseException, IOException {
     CommandLineParser parser = new DefaultParser();
     // Attempt to parse the options:
 
@@ -72,11 +75,7 @@ public class Main {
     if (!InputValidator.isValidFile(authFile)) {
       System.exit(255);
     }
-    try {
-      authKey = Authentication.getAESKeyFromAuthFile(authFile);
-    } catch (EncryptionException e) {
-      System.exit(255);
-    }
+    authKey = Authentication.getAESKeyFromAuthFile(authFile);
 
     // IP ADDRESS:
     if (cmd.hasOption("i")) {
@@ -121,9 +120,10 @@ public class Main {
 
       // Have the ATM perform the correct action.
       Atm a = new Atm(cmd, IP, port, cardFile, accountName, authKey);
-      a.runCommand();
+      // Keep trying as long as the command returns false. May call System.exit to exit the jvm.
+      while (!a.runCommand());
 
-    } catch (Exception e) {
+    } catch (ParseException | IOException | NoRequestException e) {
       System.exit(255);
     }
 

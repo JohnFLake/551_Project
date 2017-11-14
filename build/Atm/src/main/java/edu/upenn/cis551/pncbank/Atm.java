@@ -1,8 +1,10 @@
 package edu.upenn.cis551.pncbank;
 
 import java.io.File;
+import java.io.IOException;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
+import edu.upenn.cis551.pncbank.exception.NoRequestException;
 
 public class Atm {
 
@@ -13,7 +15,6 @@ public class Atm {
   private String cardString;
   private SecretKey key;
   private int port;
-  private Session session;
 
 
   public Atm(CommandLine c, String i, int p, String ca, String n, SecretKey k) {
@@ -23,13 +24,12 @@ public class Atm {
     this.ip = i;
     this.key = k;
     this.port = p;
-
   }
 
-
-
-  public void runCommand() throws Exception {
+  public boolean runCommand() throws IOException, NoRequestException {
     long amount = 0;
+
+    Session session;
 
     // MAKE ACCOUNT:
     if (cmd.hasOption("n")) {
@@ -51,7 +51,7 @@ public class Atm {
       // Create card:
       session = new Session(this.ip, this.port, this.key, cardString);
       Client.newAccount(session, accountName, amount);
-
+      return true; // If the jvm hasn't exited, the request succeeded.
 
       // DEPOSIT:
     } else if (cmd.hasOption("d")) {
@@ -65,7 +65,7 @@ public class Atm {
 
       // Get cardFile
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.Deposit(session, accountName, amount);
+      return Client.Deposit(session, accountName, amount);
     }
 
     // WITHDRAW
@@ -80,14 +80,16 @@ public class Atm {
 
       // Get cardFile
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.Withdraw(session, accountName, amount);
+      return Client.Withdraw(session, accountName, amount);
     }
 
     // GET BALANCE:
     else if (cmd.hasOption("g")) {
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.checkBalance(session, accountName);
+      return Client.checkBalance(session, accountName);
     }
+    // No request.
+    throw new NoRequestException();
   }
 
 }
