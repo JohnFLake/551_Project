@@ -37,12 +37,18 @@ public class InputValidator {
    * @return
    */
   public static long convertDollarsToCents(String input) {
-    String[] tokens = input.split("\\.");
+    String[] tokens = input.split("\\.", 2);
     StringBuilder resS = new StringBuilder();
-    for (String t : tokens) {
-      resS.append(t);
+    long res = 0;
+    if (tokens.length == 1) {
+      res = Long.parseLong(input);
+      res *= 100;
+    } else {
+      resS.append(tokens[0]);
+      resS.append(tokens[1]);
+      res = Long.parseLong(resS.toString());
     }
-    long res = Long.parseLong(resS.toString());
+
     return res;
   }
 
