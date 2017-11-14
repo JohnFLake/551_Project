@@ -90,6 +90,7 @@ public class Bank implements AutoCloseable {
 
       AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
       TransactionResponse tr = am.apply(t);
+      printTransactionResults(t, tr);
       byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
       out.write(toSend);
     } catch (EncryptionException | IOException e) {
@@ -99,7 +100,7 @@ public class Bank implements AutoCloseable {
     }
   }
 
-  void printTransactionResults(AbstractTransaction t, TransactionResponse r) {
+  static void printTransactionResults(AbstractTransaction t, TransactionResponse r) {
     if (r.isOk()) {
       if (r instanceof BalanceResponse) {
         // special case for balance
