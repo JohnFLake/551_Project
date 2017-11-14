@@ -466,7 +466,7 @@ public class AccountManagerTest {
     // Response is correct
     Assert.assertTrue(t instanceof BalanceResponse);
     BalanceResponse b = (BalanceResponse) t;
-    Assert.assertEquals(BigInteger.valueOf(balance).toString(), b.getBalance());
+    Assert.assertEquals("10000.00", b.getBalance());
     Assert.assertTrue(b.isOk());
     Assert.assertEquals(sequence, b.getSequence());
     Assert.assertEquals(accountName, b.getAccountId());

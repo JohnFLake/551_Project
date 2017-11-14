@@ -77,8 +77,16 @@ public class AccountManager {
         return new TransactionResponse(false, accountId, a.getSequence());
       }
 
-      return new BalanceResponse(true, accountId, request.getSequenceNumber(),
-          a.readValueTransaction());
+      String rawBalanceCents = a.readValueTransaction();
+      String balanceDollars;
+      if (rawBalanceCents.length() <= 2) {
+        // Balance is just in cents
+        balanceDollars = String.format("0.%02d", Integer.parseInt(rawBalanceCents, 10));
+      } else {
+        balanceDollars = rawBalanceCents.substring(0, rawBalanceCents.length() - 2) + '.'
+            + rawBalanceCents.substring(rawBalanceCents.length() - 2);
+      }
+      return new BalanceResponse(true, accountId, request.getSequenceNumber(), balanceDollars);
     }
     return null;
   }
