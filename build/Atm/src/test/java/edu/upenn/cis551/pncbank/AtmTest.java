@@ -78,6 +78,16 @@ public class AtmTest {
     assertEquals(true, InputValidator.isValidAccountName(n));
   }
 
+  @Test
+  public void testConvertToCents1() {
+    assertEquals(10011, InputValidator.convertDollarsToCents("100.11"));
+  }
+
+  @Test
+  public void testConvertToCents2() {
+    assertEquals(10011332, InputValidator.convertDollarsToCents("100113.32"));
+  }
+
 
 
 }
