@@ -50,7 +50,6 @@
 		</plugins>
 	</build>
 	<properties>
-		<outDir>bankbuild</outDir>
 		<mainClass>edu.upenn.cis551.pncbank.Bank</mainClass>
 	</properties>
 </project>

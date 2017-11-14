@@ -35,7 +35,6 @@
 		</plugins>
 	</build>
 	<properties>
-		<outDir>atmbuild</outDir>
 		<mainClass>edu.upenn.cis551.pncbank.Main</mainClass>
 	</properties>
 </project>

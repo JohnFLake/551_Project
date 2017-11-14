@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar AtmBuild/Atm-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
+java -jar AtmBuild/target/AtmBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
