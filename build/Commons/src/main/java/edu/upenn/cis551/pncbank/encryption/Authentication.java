@@ -94,8 +94,9 @@ public class Authentication {
    * 
    * @param filename
    * @return
+   * @throws IOException
    */
-  public static SecretKey getAESKeyFromAuthFile(String filename) throws Exception {
+  public static SecretKey getAESKeyFromAuthFile(String filename) throws IOException {
 
     Path path = Paths.get(filename);
     byte[] data = Files.readAllBytes(path);
