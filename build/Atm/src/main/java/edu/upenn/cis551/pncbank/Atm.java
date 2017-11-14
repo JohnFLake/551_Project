@@ -65,7 +65,6 @@ public class Atm {
 
       // Get cardFile
       session = new Session(this.ip, this.port, this.key, cardString);
-      // Retries as long as the response is false
       return Client.Deposit(session, accountName, amount);
     }
 
