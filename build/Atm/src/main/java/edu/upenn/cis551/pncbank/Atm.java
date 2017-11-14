@@ -1,7 +1,6 @@
 package edu.upenn.cis551.pncbank;
 
 import java.io.File;
-import java.math.BigDecimal;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 
@@ -28,8 +27,9 @@ public class Atm {
   }
 
 
+
   public void runCommand() throws Exception {
-    BigDecimal amount = null;
+    long amount = 0;
 
     // MAKE ACCOUNT:
     if (cmd.hasOption("n")) {
@@ -39,7 +39,7 @@ public class Atm {
       if (!InputValidator.isValidMoneyAmount(accValue)) {
         System.exit(255);
       } else {
-        amount = new BigDecimal(accValue);
+        amount = InputValidator.convertDollarsToCents(accValue);
       }
 
       // Card file cannot exist.
@@ -50,7 +50,7 @@ public class Atm {
 
       // Create card:
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.newAccount(session, accountName, amount.intValue());
+      Client.newAccount(session, accountName, amount);
 
 
       // DEPOSIT:
@@ -60,12 +60,12 @@ public class Atm {
       if (!InputValidator.isValidMoneyAmount(depValue)) {
         System.exit(255);
       } else {
-        amount = new BigDecimal(depValue);
+        amount = InputValidator.convertDollarsToCents(depValue);
       }
 
       // Get cardFile
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.Deposit(session, accountName, amount.intValue());
+      Client.Deposit(session, accountName, amount);
     }
 
     // WITHDRAW
@@ -75,12 +75,12 @@ public class Atm {
       if (!InputValidator.isValidMoneyAmount(wdValue)) {
         System.exit(255);
       } else {
-        amount = new BigDecimal(wdValue);
+        amount = InputValidator.convertDollarsToCents(wdValue);
       }
 
       // Get cardFile
       session = new Session(this.ip, this.port, this.key, cardString);
-      Client.Withdraw(session, accountName, amount.intValue());
+      Client.Withdraw(session, accountName, amount);
     }
 
     // GET BALANCE:
