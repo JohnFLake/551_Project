@@ -8,9 +8,9 @@ package edu.upenn.cis551.pncbank.utils;
  */
 public class PrintUtils {
   /**
-   * Utility function for use in toString methods of extending classes. Must exist because the spec
-   * expects 100.00 to print as 100, 0 to print as 0, 100.10 to print as 100.1, and 100.11 to print
-   * as 100.11.
+   * Utility function for consistently printing currencies. Must exist because the spec expects
+   * 100.00 to print as 100, 0 to print as 0, 100.10 to print as 100.1, and 100.11 to print as
+   * 100.11.
    * 
    * @param valAsCents The long value as cents
    * @return
