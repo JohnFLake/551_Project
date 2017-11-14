@@ -19,6 +19,7 @@ import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
+import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 
 public class Bank implements AutoCloseable {
@@ -50,10 +51,11 @@ public class Bank implements AutoCloseable {
 
   void start() throws IOException {
     while (true) {
-      // TODO if the server socket dies, reinitialize?
       try (ServerSocket sSocket = new ServerSocket(this.port)) {
         while (this.notShutdown) {
-          handleTransaction(sSocket.accept());
+          Socket s = sSocket.accept();
+          s.setSoTimeout(10000);
+          handleTransaction(s);
         }
         break;
       }
@@ -67,17 +69,12 @@ public class Bank implements AutoCloseable {
     byte[] buf = new byte[4096];
     while (true) {
       int n = in.read(buf);
-      System.out.println("Buffer: " + new String(buf));
-      System.out.println("N: " + n);
       if (n <= 0)
         break;
       baos.write(buf, 0, n);
     }
 
-
     byte data[] = baos.toByteArray();
-
-    System.out.println("Data length: " + data.length);
     return data;
   }
 
@@ -96,13 +93,28 @@ public class Bank implements AutoCloseable {
       byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
       out.write(toSend);
     } catch (EncryptionException | IOException e) {
-      // Note: On an encryption/decription/or IO exception, no response is written out. Improve?
-      // TODO
-      e.printStackTrace();
+      // Also catches SocketTimeoutExceptions due to read timeouts.
+      System.out.println("protocol_error");
+      System.out.flush();
     }
   }
 
+  void printTransactionResults(AbstractTransaction t, TransactionResponse r) {
+    if (r.isOk()) {
+      if (r instanceof BalanceResponse) {
+        // special case for balance
+        System.out.println(r.toString());
+      } else {
+        System.out.println(t.toString());
+      }
+    } else {
+      System.out.println("protocol_error");
+    }
+    System.out.flush();
+  }
+
   public static void main(String[] args) {
+    System.setProperty("line.separator", "\n");
     String authFileName;
     int bankPort;
     SecretKey bankKey;
