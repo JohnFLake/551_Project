@@ -89,7 +89,7 @@ public class Client {
   }
 
 
-  public static void newAccount(Session session, String accountName, int balance) {
+  public static void newAccount(Session session, String accountName, long balance) {
     if (balance < 10) {
       System.exit(255);
     }
@@ -121,7 +121,7 @@ public class Client {
   }
 
 
-  public static void Deposit(Session session, String accountName, int deposit) throws Exception {
+  public static void Deposit(Session session, String accountName, long deposit) throws Exception {
 
     // Check on the proper formatting of this
     File cardFile = new File(session.getCard());
@@ -146,7 +146,7 @@ public class Client {
 
 
 
-  public static void Withdraw(Session session, String accountName, int withdraw) throws Exception {
+  public static void Withdraw(Session session, String accountName, long withdraw) throws Exception {
     if (withdraw < 0) {
       System.exit(255);
     }

@@ -29,6 +29,23 @@ public class InputValidator {
     return true;
   }
 
+
+  /**
+   * Given a dollar string in form XXX.XX, convert to long
+   * 
+   * @param input
+   * @return
+   */
+  public static long convertDollarsToCents(String input) {
+    String[] tokens = input.split("\\.");
+    StringBuilder resS = new StringBuilder();
+    for (String t : tokens) {
+      resS.append(t);
+    }
+    long res = Long.parseLong(resS.toString());
+    return res;
+  }
+
   /**
    * Given an account name string, determine if it's valid.
    * 
