@@ -1,7 +1,6 @@
-bin/*
-build/bin/*
-build/makebin/*
 build/lib/*
 .DS_Store
 .settings/
 */.settings/
+*.card
+*.auth

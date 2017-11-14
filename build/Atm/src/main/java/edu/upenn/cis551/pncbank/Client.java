@@ -54,7 +54,7 @@ public class Client {
 
       TransactionResponse tResponse =
           objectMapper.readValue(decryptedResponse, TransactionResponse.class);
-      if (tResponse == null || !tResponse.isOk()) {
+      if (tResponse == null) {
         System.exit(255);
       }
       return tResponse;
