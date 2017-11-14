@@ -121,7 +121,8 @@ public class Main {
 
       // Have the ATM perform the correct action.
       Atm a = new Atm(cmd, IP, port, cardFile, accountName, authKey);
-      a.runCommand();
+      // Keep trying as long as the command returns false. May call System.exit to exit the jvm.
+      while (!a.runCommand());
 
     } catch (Exception e) {
       System.exit(255);

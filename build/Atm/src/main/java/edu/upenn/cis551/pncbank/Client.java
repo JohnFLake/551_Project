@@ -2,7 +2,6 @@ package edu.upenn.cis551.pncbank;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import javax.crypto.SecretKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +11,7 @@ import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.CardFile;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
+import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
 import edu.upenn.cis551.pncbank.transaction.BalancePOJO;
 import edu.upenn.cis551.pncbank.transaction.CreateAccountPOJO;
 import edu.upenn.cis551.pncbank.transaction.DepositPOJO;
@@ -21,10 +21,9 @@ import edu.upenn.cis551.pncbank.transaction.WithdrawPOJO;
 public class Client {
   static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption();
 
-  public static TransactionResponse sendPOJO(Object pojo, Session session) {
+  public static TransactionResponse sendPOJO(AbstractTransaction pojo, Session session) {
 
     ObjectMapper objectMapper = new ObjectMapper();
-    byte[] response = null;
     Socket AtmBank = null;
 
     // Encrypt this POJO:
@@ -37,14 +36,11 @@ public class Client {
     }
 
     try {
-      AtmBank = new Socket();
+      AtmBank = new Socket(session.getIP(), session.getPort());
       AtmBank.setSoTimeout(10 * 1000);
-      AtmBank.connect(new InetSocketAddress(session.getIP(), session.getPort()), 10 * 1000);
-
-
 
       // Send the encrypted bytes and receive a response:
-      response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
+      byte[] response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
 
       // The response is encrypted. we need to decrypt it.
       byte[] decryptedResponse = null;
@@ -104,24 +100,19 @@ public class Client {
 
 
     // Make pojo to send.
-    Object pojo =
+    CreateAccountPOJO pojo =
         new CreateAccountPOJO(accountName, newCard.getPin(), balance, newCard.getSequenceNumber());
 
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session);
-    System.out.println(tResponse.toString());
-
-    // Update sequence number
-    if (newCard.getSequenceNumber() == tResponse.getSequence()) {
-      updateCardSeqNumber(newCard, session.getCard(), tResponse.getSequence() + 1);
-    } else {
-      System.exit(255);
-    }
+    handleResponse(pojo, tResponse, newCard, session.getCard());
+    // Note, there's no way that the bank can suggest a retry for this type of request.
   }
 
 
-  public static void Deposit(Session session, String accountName, long deposit) throws Exception {
+  public static boolean Deposit(Session session, String accountName, long deposit)
+      throws IOException {
 
     // Check on the proper formatting of this
     File cardFile = new File(session.getCard());
@@ -131,22 +122,16 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object pojo =
+    DepositPOJO pojo =
         new DepositPOJO(accountName, checkCard.getPin(), deposit, checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session);
-    // Update sequence number
-    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
-      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
-    } else {
-      System.exit(255);
-    }
+    return handleResponse(pojo, tResponse, checkCard, session.getCard());
   }
 
-
-
-  public static void Withdraw(Session session, String accountName, long withdraw) throws Exception {
+  public static boolean Withdraw(Session session, String accountName, long withdraw)
+      throws IOException {
     if (withdraw < 0) {
       System.exit(255);
     }
@@ -158,23 +143,18 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object pojo =
+    WithdrawPOJO pojo =
         new WithdrawPOJO(accountName, checkCard.getPin(), withdraw, checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session);
-    // Update sequence number
-    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
-      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
-    } else {
-      System.exit(255);
-    }
+    return handleResponse(pojo, tResponse, checkCard, session.getCard());
 
   }
 
 
 
-  public static void checkBalance(Session session, String accountName) throws Exception {
+  public static boolean checkBalance(Session session, String accountName) throws IOException {
     File cardFile = new File(session.getCard());
     if (!cardFile.exists()) {
       System.exit(255);
@@ -182,15 +162,48 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    Object pojo = new BalancePOJO(accountName, checkCard.getPin(), checkCard.getSequenceNumber());
+    BalancePOJO pojo =
+        new BalancePOJO(accountName, checkCard.getPin(), checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session);
-    // Update sequence number
-    if (checkCard.getSequenceNumber() == tResponse.getSequence()) {
-      updateCardSeqNumber(checkCard, session.getCard(), tResponse.getSequence() + 1);
+    return handleResponse(pojo, tResponse, checkCard, session.getCard());
+  }
+
+  /**
+   * Helper function to handle the response from the bank. If <code>false</code> is returned the
+   * request should be retried with the updated card file.<br/>
+   * If the response indicates that the request failed and that a retry won't work, causes the JVM
+   * to exit with code 255.
+   * 
+   * @param request
+   * @param response
+   * @param card
+   * @param cardName
+   * @return <code>true</code> if the transaction is successful, or <code>false</code> if the
+   *         transaction failed due to obsolete sequence number.
+   */
+  private static boolean handleResponse(AbstractTransaction request, TransactionResponse response,
+      CardFile card, String cardName) {
+    if (response.isOk()) {
+      if (request instanceof BalancePOJO) {
+        System.out.println(response.toString());
+      } else {
+        System.out.println(request.toString());
+      }
+      System.out.flush();
+      updateCardSeqNumber(card, cardName, response.getSequence() + 1);
+      return true;
     } else {
-      System.exit(255);
+      // Bank failed the transaction.
+      if (card.getSequenceNumber() != response.getSequence()) {
+        // Bank is telling the atm to update the sequence number.
+        updateCardSeqNumber(card, cardName, response.getSequence());
+      } else {
+        // General failure
+        System.exit(255);
+      }
+      return false;
     }
   }
 }

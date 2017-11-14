@@ -36,9 +36,9 @@ public class Authentication {
    * 
    * @param fileName
    * @return
-   * @throws Exception
+   * @throws IOException if the cardfile can't be loaded
    */
-  public static CardFile getCardFile(String fileName) throws Exception {
+  public static CardFile getCardFile(String fileName) throws IOException {
     String json;
     // Read base64 key string from the given file
     try {
