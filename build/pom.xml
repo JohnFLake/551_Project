@@ -7,8 +7,8 @@
 	<packaging>pom</packaging>
 	<name>551 Bank-ATM application</name>
 	<modules>
-		<module>Bank</module>
-		<module>Atm</module>
+		<module>BankBuild</module>
+		<module>AtmBuild</module>
 		<module>Commons</module>
 	</modules>
 	<dependencyManagement>
