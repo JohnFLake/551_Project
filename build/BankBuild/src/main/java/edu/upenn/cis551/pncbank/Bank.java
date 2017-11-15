@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,9 +18,9 @@ import edu.upenn.cis551.pncbank.encryption.AESEncryption;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
-import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
-import edu.upenn.cis551.pncbank.transaction.response.BalanceResponse;
-import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
+import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
+import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
+import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Bank implements AutoCloseable {
@@ -90,8 +89,8 @@ public class Bank implements AutoCloseable {
       // Decrypt into a transaction request
       byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
 
-      AbstractRequest t = this.mapper.readValue(decrypted, AbstractRequest.class);
-      Optional<TransactionResponse> tr = am.apply(t);
+      AbstractTransaction t = this.mapper.readValue(decrypted, AbstractTransaction.class);
+      TransactionResponse tr = am.apply(t);
       printTransactionResults(t, tr);
       byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
       out.write(toSend);
@@ -102,11 +101,7 @@ public class Bank implements AutoCloseable {
     }
   }
 
-  static void printTransactionResults(AbstractRequest t, Optional<TransactionResponse> or) {
-    if (!or.isPresent()) {
-      return;
-    }
-    TransactionResponse r = or.get();
+  static void printTransactionResults(AbstractTransaction t, TransactionResponse r) {
     if (r.isOk()) {
       if (r instanceof BalanceResponse) {
         // special case for balance
