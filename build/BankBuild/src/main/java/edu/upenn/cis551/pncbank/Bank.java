@@ -130,7 +130,7 @@ public class Bank implements AutoCloseable {
       authFileName = cl.getOptionValue("s", DEFAULT_BANK_AUTH);
       bankPort = Integer.parseInt(cl.getOptionValue("p", DEFAULT_BANK_PORT), 10);
       bankKey = Authentication.generateAuthFile(authFileName);
-      System.out.println("Created");
+      System.out.println("created");
       System.out.flush();
     } catch (ParseException | NumberFormatException | EncryptionException | IOException e) {
       // Failed to parse args or to generate the authfile.
