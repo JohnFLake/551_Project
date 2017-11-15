@@ -21,3 +21,6 @@ kill -KILL $last_pid > /dev/null
 
 ./bank
 echo "bank.auth already exists: " $?
+
+./bank -s
+echo "No bank.auth given: " $?
