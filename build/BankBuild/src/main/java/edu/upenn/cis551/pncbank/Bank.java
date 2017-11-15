@@ -115,7 +115,7 @@ public class Bank implements AutoCloseable {
         System.out.println(t.toString());
       }
     } else {
-      System.out.println("protocol_error");
+      // System.out.println("protocol_error");
     }
     System.out.flush();
   }
