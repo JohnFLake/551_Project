@@ -1,6 +1,6 @@
 #!/bin/bash
 trap 'kill -TERM $PID; wait $PID' TERM INT
-java -jar /home/builder/submission/build/BankBuild/target/BankBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
+java -jar /home/builder/submission/build/BankBuild/target/BankBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@ &
 #java -jar /Users/johnlake/Programs/551/551_Project/build/BankBuild/target/BankBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
 PID=$!
 wait $PID
