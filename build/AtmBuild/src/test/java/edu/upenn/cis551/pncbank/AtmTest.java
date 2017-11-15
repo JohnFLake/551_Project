@@ -2,6 +2,7 @@ package edu.upenn.cis551.pncbank;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class AtmTest {
 

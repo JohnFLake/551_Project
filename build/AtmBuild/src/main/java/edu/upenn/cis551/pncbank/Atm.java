@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import edu.upenn.cis551.pncbank.exception.NoRequestException;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Atm {
 

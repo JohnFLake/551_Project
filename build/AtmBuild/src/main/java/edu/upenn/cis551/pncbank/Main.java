@@ -11,6 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.exception.NoRequestException;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Main {
 

@@ -1,4 +1,4 @@
-package edu.upenn.cis551.pncbank;
+package edu.upenn.cis551.pncbank.utils;
 
 import java.math.BigDecimal;
 import org.apache.commons.cli.CommandLine;

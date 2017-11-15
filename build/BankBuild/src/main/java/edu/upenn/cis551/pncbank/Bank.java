@@ -21,6 +21,7 @@ import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
 import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Bank implements AutoCloseable {
 
@@ -128,7 +129,15 @@ public class Bank implements AutoCloseable {
       o.addOption("s", true, "The name of the auth file");
       CommandLine cl = clp.parse(o, args);
       authFileName = cl.getOptionValue("s", DEFAULT_BANK_AUTH);
+      if (!InputValidator.isValidFile(authFileName)) {
+        System.err.println("Invalid auth file: " + authFileName);
+        System.exit(255);
+      }
       bankPort = Integer.parseInt(cl.getOptionValue("p", DEFAULT_BANK_PORT), 10);
+      if (!InputValidator.isValidPortNumber(bankPort + "")) {
+        System.err.println("Invalid port: " + bankPort);
+        System.exit(255);
+      }
       bankKey = Authentication.generateAuthFile(authFileName);
       System.out.print("created\n");
       System.out.flush();
