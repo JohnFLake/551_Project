@@ -28,12 +28,15 @@ public class AccountManager {
 
   /**
    * Gets an account iff it exists and the sequence number matches. If the account is pending with
-   * the previous sequence number, the account is first committed.
+   * the previous sequence number, the account is first committed. If a transaction is pending with
+   * the previous sequence number on the account, commits the previous transaction and then
+   * succeeds.
    * 
    * @param accountName
    * @param s
    * @return An Optional containing the matching account.
    */
+  // WARNING!!! This method has a number of side effects and should not be used in tests.
   public Optional<Account> get(String accountName, long s) {
     // If something is asking for the pending account with the previous sequence number, it must
     // have thought the creation succeeded and sent an ack. Finish the pending call.
@@ -41,7 +44,12 @@ public class AccountManager {
         && this.pending.get(accountName).getSequence() == s - 1) {
       this.commitAccount(accountName);
     }
-    return Optional.ofNullable(this.accounts.get(accountName)).filter(a -> a.getSequence() == s);
+    Account a = this.accounts.get(accountName);
+    return Optional.ofNullable(a).filter(acct -> {
+      acct.commit(s - 1); // First commit any pending transactions with the previous sequence
+                          // number, as this may change the account's sequence number expectation.
+      return acct.getSequence() == s;
+    });
   }
 
   /**

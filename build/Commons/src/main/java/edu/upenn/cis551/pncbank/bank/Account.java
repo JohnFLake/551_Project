@@ -63,8 +63,8 @@ public class Account {
     if (this.pending != null && this.pending.getSequenceNumber() == s) {
       this.pending.commit(Optional.of(this));
       this.sequence++;
+      this.pending = null;
     }
-    this.pending = null;
   }
 
   public void defer(AbstractRequest r) {
