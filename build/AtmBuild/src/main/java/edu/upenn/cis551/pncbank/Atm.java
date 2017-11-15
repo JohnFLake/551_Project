@@ -32,6 +32,7 @@ public class Atm {
 
     Session session;
 
+
     if (!cmd.getArgList().isEmpty()) {
       System.exit(255);
     }
@@ -65,6 +66,9 @@ public class Atm {
       if (!InputValidator.isValidMoneyAmount(depValue)) {
         System.exit(255);
       } else {
+        if (depValue.equals("0.00")) {
+          System.exit(255);
+        }
         amount = InputValidator.convertDollarsToCents(depValue);
       }
 
@@ -90,6 +94,7 @@ public class Atm {
 
     // GET BALANCE:
     else if (cmd.hasOption("g")) {
+
       if (cmd.getOptionValue("g") != null) {
         System.exit(255);
       }

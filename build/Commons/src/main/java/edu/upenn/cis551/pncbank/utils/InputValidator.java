@@ -114,7 +114,7 @@ public class InputValidator {
     if (argTooLong(str)) {
       return false;
     }
-    if (!str.matches("(0|[1-9][0-9]*)(\\.[0-9]{2})?")) {
+    if (!str.matches("(0|[1-9][0-9]*)\\.[0-9]{2}")) {
       return false;
     }
 
