@@ -62,6 +62,10 @@ public class Client {
     } catch (IOException e) {
       // ERROR with connection, including timeout.
       System.err.println("Error with the socket: " + e.getMessage());
+      if (pojo.getClass().equals(CreateAccountPOJO.class)) {
+        File f = new File(session.getCard());
+        f.delete();
+      }
       System.exit(63);
     }
     return null;
