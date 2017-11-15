@@ -18,17 +18,19 @@ public class BalanceRequestTest {
     long balance = 1000000;
     long sequence = 12345;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, balance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, balance);
+    test.commitAccount(accountName);
     sequence++;
     BalanceRequest bal = new BalanceRequest(accountName, validator, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(bal);
+    oa.ifPresent(a -> a.commit(bal.sequenceNumber));
 
     // Verify
     // State is changed (only sequence number)
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence + 1, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.getBalance());
@@ -58,7 +60,7 @@ public class BalanceRequestTest {
 
     // Verify
     // State is unchanged
-    Assert.assertFalse(test.get(accountName).isPresent());
+    Assert.assertFalse(test.get(accountName, sequence).isPresent());
 
     // Response is correct
     Assert.assertTrue(ot.isPresent());
@@ -78,17 +80,19 @@ public class BalanceRequestTest {
     long sequence = 12345;
     long reqSequence = 63457234;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, balance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, balance);
+    test.commitAccount(accountName);
     sequence++;
     BalanceRequest bal = new BalanceRequest(accountName, validator, reqSequence);
+    oa.ifPresent(a -> a.commit(bal.sequenceNumber));
 
     // Run
     Optional<TransactionResponse> ot = test.apply(bal);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.getBalance());
@@ -111,17 +115,19 @@ public class BalanceRequestTest {
     long balance = 1000000;
     long sequence = 12345;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, balance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, balance);
+    test.commitAccount(accountName);
     sequence++;
     BalanceRequest bal = new BalanceRequest(accountName, validator2, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(bal);
+    oa.ifPresent(a -> a.commit(bal.sequenceNumber));
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.getBalance());

@@ -1,6 +1,7 @@
 package edu.upenn.cis551.pncbank.transaction.request;
 
 import java.util.Optional;
+import edu.upenn.cis551.pncbank.bank.Account;
 import edu.upenn.cis551.pncbank.bank.IAccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 
@@ -19,8 +20,12 @@ public class AckRequest extends AbstractRequest {
 
   @Override
   public Optional<TransactionResponse> apply(IAccountManager am) {
-    am.get(this.getAccountName()).ifPresent(account -> account.commit(this.getSequenceNumber()));
+    am.commitAccount(this.getAccountName());
+    am.get(accountName, this.sequenceNumber).ifPresent(a -> a.commit(this.sequenceNumber));
     return Optional.empty();
   }
+
+  @Override
+  public void commit(Optional<Account> account) {}
 
 }

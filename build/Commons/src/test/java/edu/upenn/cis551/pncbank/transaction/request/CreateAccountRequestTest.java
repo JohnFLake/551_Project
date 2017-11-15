@@ -22,6 +22,7 @@ public class CreateAccountRequestTest {
 
     // Run
     Optional<TransactionResponse> ot = test.apply(create);
+    test.commitAccount(accountName);
 
     // Verify
     // State is now correct

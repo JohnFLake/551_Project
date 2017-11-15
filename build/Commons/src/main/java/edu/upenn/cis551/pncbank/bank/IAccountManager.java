@@ -14,12 +14,14 @@ public interface IAccountManager {
   Optional<TransactionResponse> apply(AbstractRequest t);
 
   /**
-   * Gets the account for this account name
+   * Gets the account for this account name. If the account is pending and the sequence number is
+   * the next one as kept in the pending account, the account is committed.
    * 
    * @param accountName
-   * @return
+   * @param s The sequence number
+   * @return An optional containing the matching account.
    */
-  Optional<Account> get(String accountName);
+  Optional<Account> get(String accountName, long s);
 
   /**
    * Creates a new account in the manager iff no such account already exists.
@@ -33,5 +35,13 @@ public interface IAccountManager {
    */
   Optional<Account> createAccount(String accountName, String validator, long sequenceNumber,
       long balance);
+
+  /**
+   * Commits an account after an acknowledgement.
+   * 
+   * @param accountName
+   * @return
+   */
+  public boolean commitAccount(String accountName);
 
 }

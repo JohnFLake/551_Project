@@ -1,6 +1,7 @@
 package edu.upenn.cis551.pncbank.transaction.request;
 
 import java.util.Optional;
+import edu.upenn.cis551.pncbank.bank.Account;
 import edu.upenn.cis551.pncbank.bank.IAccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.PrintUtils;
@@ -43,11 +44,18 @@ public class CreateAccountRequest extends AbstractRequest {
 
   @Override
   public Optional<TransactionResponse> apply(IAccountManager am) {
-    return Optional.of(am
-        .createAccount(this.getAccountName(), this.getValidator(), this.getSequenceNumber(),
-            this.getBalance())
-        .map(acct -> new TransactionResponse(true, this.getAccountName(), this.getSequenceNumber()))
-        .orElse(new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber())));
+    TransactionResponse r = am.createAccount(this.getAccountName(), this.getValidator(),
+        this.getSequenceNumber(), this.getBalance()).map(acct -> {
+          return new TransactionResponse(true, this.getAccountName(), this.getSequenceNumber());
+        }).orElseGet(() -> {
+          return new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber());
+        });
+    return Optional.of(r);
+  }
+
+  @Override
+  public void commit(Optional<Account> account) {
+    // Shouldn't be called
   }
 
 }

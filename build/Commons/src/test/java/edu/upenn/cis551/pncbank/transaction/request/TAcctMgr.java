@@ -1,5 +1,6 @@
 package edu.upenn.cis551.pncbank.transaction.request;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class TAcctMgr implements IAccountManager {
   }
 
   @Override
-  public Optional<Account> get(String accountName) {
+  public Optional<Account> get(String accountName, long s) {
     // TODO Auto-generated method stub
     return Optional.ofNullable(accounts.get(accountName));
   }
@@ -32,9 +33,15 @@ public class TAcctMgr implements IAccountManager {
   public Optional<Account> createAccount(String accountName, String validator, long sequenceNumber,
       long balance) {
     Account a = new Account(validator, sequenceNumber);
-    a.updateValueAndIncrementSeq(balance);
+    a.setBalance(BigInteger.valueOf(balance));
     accounts.put(accountName, a);
     return Optional.of(a);
+  }
+
+  @Override
+  public boolean commitAccount(String accountName) {
+    accounts.get(accountName).incrementSequence();
+    return true;
   }
 
 }

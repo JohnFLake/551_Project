@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import edu.upenn.cis551.pncbank.bank.Account;
 import edu.upenn.cis551.pncbank.bank.IAccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 
@@ -39,9 +40,15 @@ public abstract class AbstractRequest {
   /**
    * Applies this transaction to an account.
    * 
-   * @param accountName The name of the account.
-   * @param am The account manager to apply to.
+   * @param am The account manager an which to apply
    * @return An optional transaction response (some transactions do not respond).
    */
   public abstract Optional<TransactionResponse> apply(IAccountManager am);
+
+  /**
+   * Commits this transaction.
+   * 
+   * @param account
+   */
+  public abstract void commit(Optional<Account> account);
 }

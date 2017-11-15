@@ -45,17 +45,19 @@ public class WithdrawRequestTest {
     long sequence = 12345;
     long amount = 100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.get().commit(sequence);
 
     // Verify
     // State is changed
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence + 1, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance - amount), a.getBalance());
@@ -102,17 +104,19 @@ public class WithdrawRequestTest {
     long sequence = 12345;
     long amount = -100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.get().commit(sequence);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());
@@ -134,17 +138,19 @@ public class WithdrawRequestTest {
     long sequence = 12345;
     long amount = oldBalance + 1;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.get().commit(sequence);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());
@@ -167,17 +173,19 @@ public class WithdrawRequestTest {
     long sequence = 12345;
     long amount = 100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     WithdrawRequest deposit = new WithdrawRequest(accountName, validator2, amount, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.get().commit(sequence);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());
@@ -200,17 +208,19 @@ public class WithdrawRequestTest {
     long reqSequence = 6834572;
     long amount = 100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, accountSequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, accountSequence, oldBalance);
+    test.commitAccount(accountName);
     accountSequence++;
     WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, reqSequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.get().commit(reqSequence);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, accountSequence).isPresent());
+    Account a = test.get(accountName, accountSequence).get();
     Assert.assertEquals(accountSequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());

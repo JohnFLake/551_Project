@@ -43,17 +43,19 @@ public class DepositRequestTest {
     long sequence = 12345;
     long amount = 100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     DepositRequest deposit = new DepositRequest(accountName, validator, amount, sequence);
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
+    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
 
     // Verify
     // State is changed
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence + 1, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance + amount), a.getBalance());
@@ -99,18 +101,20 @@ public class DepositRequestTest {
     long reqSequence = 12346123;
     long acctSequence = 12345;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, acctSequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, acctSequence, oldBalance);
+    test.commitAccount(accountName);
     acctSequence++;
 
     DepositRequest deposit = new DepositRequest(accountName, validator, 100, reqSequence);
+    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, acctSequence).isPresent());
+    Account a = test.get(accountName, acctSequence).get();
     Assert.assertEquals(acctSequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());
@@ -133,17 +137,19 @@ public class DepositRequestTest {
     long sequence = 12345;
     long amount = 100;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, oldBalance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
+    test.commitAccount(accountName);
     sequence++;
     DepositRequest deposit = new DepositRequest(accountName, validator2, amount, sequence);
+    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(oldBalance), a.getBalance());
@@ -165,17 +171,19 @@ public class DepositRequestTest {
     long sequence = 12345;
     long amount = -1;
     TAcctMgr test = new TAcctMgr();
-    test.createAccount(accountName, validator, sequence, balance);
+    Optional<Account> oa = test.createAccount(accountName, validator, sequence, balance);
+    test.commitAccount(accountName);
     sequence++;
     DepositRequest deposit = new DepositRequest(accountName, validator, amount, sequence);
+    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
 
     // Run
     Optional<TransactionResponse> ot = test.apply(deposit);
 
     // Verify
     // State is unchanged
-    Assert.assertTrue(test.get(accountName).isPresent());
-    Account a = test.get(accountName).get();
+    Assert.assertTrue(test.get(accountName, sequence).isPresent());
+    Account a = test.get(accountName, sequence).get();
     Assert.assertEquals(sequence, a.getSequence());
     Assert.assertEquals(validator, a.getCardValidator());
     Assert.assertEquals(BigInteger.valueOf(balance), a.getBalance());

@@ -1,6 +1,8 @@
 package edu.upenn.cis551.pncbank.transaction.request;
 
+import java.math.BigInteger;
 import java.util.Optional;
+import edu.upenn.cis551.pncbank.bank.Account;
 import edu.upenn.cis551.pncbank.bank.IAccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.PrintUtils;
@@ -46,13 +48,28 @@ public class WithdrawRequest extends AbstractRequest {
 
   @Override
   public Optional<TransactionResponse> apply(IAccountManager am) {
-    return Optional.of(am.get(this.getAccountName())
-        .filter(a -> a.getCardValidator().equals(this.getValidation()))
+    Optional<Account> account = am.get(this.getAccountName(), this.getSequenceNumber());
+    TransactionResponse r = account.filter(a -> a.getCardValidator().equals(this.getValidation()))
         .filter(a -> a.getSequence() == this.getSequenceNumber())
-        .filter(a -> this.getWithdraw() > 0)
-        // updateValue checks that the balance can't be made negative.
-        .map(a -> new TransactionResponse(a.updateValueAndIncrementSeq(-1 * this.getWithdraw()),
-            this.getAccountName(), this.getSequenceNumber()))
-        .orElse(new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber())));
+        .filter(a -> this.getWithdraw() > 0).filter(a -> a.getBalance()
+            .subtract(BigInteger.valueOf(this.getWithdraw())).compareTo(BigInteger.ZERO) >= 0)
+        .map(a -> {
+          return new TransactionResponse(true, this.getAccountName(), this.getSequenceNumber());
+        }).orElseGet(() -> {
+          return new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber());
+        });
+
+    if (r.isOk()) {
+      account.get().defer(this);
+    }
+    return Optional.of(r);
+  }
+
+  @Override
+  public void commit(Optional<Account> account) {
+    account.ifPresent(
+        a -> a.setBalance(a.getBalance().subtract(BigInteger.valueOf(this.getWithdraw()))));
+    System.out.println(this.toString());
+    System.out.flush();
   }
 }

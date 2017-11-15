@@ -1,6 +1,7 @@
 package edu.upenn.cis551.pncbank.transaction.request;
 
 import java.util.Optional;
+import edu.upenn.cis551.pncbank.bank.Account;
 import edu.upenn.cis551.pncbank.bank.IAccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
@@ -30,11 +31,30 @@ public class BalanceRequest extends AbstractRequest {
 
   @Override
   public Optional<TransactionResponse> apply(IAccountManager am) {
-    return Optional.of(am.get(this.getAccountName())
-        .filter(a -> a.getCardValidator().equals(this.getValidation()))
-        .filter(a -> a.getSequence() == this.getSequenceNumber())
-        .map(a -> (TransactionResponse) new BalanceResponse(true, this.getAccountName(),
-            this.getSequenceNumber(), PrintUtils.writeCurrency(a.readValueTransaction())))
-        .orElse(new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber())));
+    Optional<Account> account = am.get(this.getAccountName(), this.getSequenceNumber());
+    TransactionResponse r = account.filter(a -> a.getCardValidator().equals(this.getValidation()))
+        .filter(a -> a.getSequence() == this.getSequenceNumber()).map(a -> {
+          return (TransactionResponse) new BalanceResponse(true, this.getAccountName(),
+              this.getSequenceNumber(), PrintUtils.writeCurrency(a.getBalance().toString()));
+        }).orElse(new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber()));
+
+    if (r.isOk()) {
+      account.get().defer(this);
+    }
+
+    return Optional.of(r);
+  }
+
+  @Override
+  public void commit(Optional<Account> account) {
+    account.ifPresent(a -> {
+      StringBuilder sb = new StringBuilder();
+      sb.append('{');
+      sb.append("\"balance\":").append(PrintUtils.writeCurrency(a.getBalance().toString()))
+          .append(',');
+      sb.append("\"account\":\"").append(this.getAccountName()).append("\"}");
+      System.out.println(sb.toString());
+      System.out.flush();
+    });
   }
 }
