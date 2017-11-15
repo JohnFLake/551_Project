@@ -90,11 +90,14 @@ public class Bank implements AutoCloseable {
       // Decrypt into a transaction request
       byte[] decrypted = encryption.decrypt(inputData, this.bankKey);
 
-      AbstractRequest t = this.mapper.readValue(decrypted, AbstractRequest.class);
-      Optional<TransactionResponse> tr = am.apply(t);
-      printTransactionResults(t, tr);
-      byte[] toSend = encryption.encrypt(this.mapper.writeValueAsBytes(tr), this.bankKey);
-      out.write(toSend);
+      AbstractRequest r = this.mapper.readValue(decrypted, AbstractRequest.class);
+      Optional<TransactionResponse> tr = am.apply(r);
+      printTransactionResults(r, tr);
+      if (tr.isPresent()) {
+        byte[] serialized = this.mapper.writeValueAsBytes(tr.get());
+        byte[] toSend = encryption.encrypt(serialized, this.bankKey);
+        out.write(toSend);
+      }
     } catch (EncryptionException | IOException e) {
       // Also catches SocketTimeoutExceptions due to read timeouts.
       System.out.println("protocol_error");
