@@ -19,7 +19,7 @@ public class TAcctMgr implements IAccountManager {
 
   @Override
   public Optional<TransactionResponse> apply(AbstractRequest t) {
-    return t.apply(t.getAccountName(), this);
+    return t.apply(this);
   }
 
   @Override

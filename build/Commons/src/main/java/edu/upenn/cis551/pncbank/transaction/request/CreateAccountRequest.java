@@ -42,9 +42,9 @@ public class CreateAccountRequest extends AbstractRequest {
   }
 
   @Override
-  public Optional<TransactionResponse> apply(String accountName, IAccountManager am) {
+  public Optional<TransactionResponse> apply(IAccountManager am) {
     return Optional.of(am
-        .createAccount(accountName, this.getValidator(), this.getSequenceNumber(),
+        .createAccount(this.getAccountName(), this.getValidator(), this.getSequenceNumber(),
             this.getBalance())
         .map(acct -> new TransactionResponse(true, this.getAccountName(), this.getSequenceNumber()))
         .orElse(new TransactionResponse(false, this.getAccountName(), this.getSequenceNumber())));

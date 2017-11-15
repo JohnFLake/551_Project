@@ -43,5 +43,5 @@ public abstract class AbstractRequest {
    * @param am The account manager to apply to.
    * @return An optional transaction response (some transactions do not respond).
    */
-  public abstract Optional<TransactionResponse> apply(String accountName, IAccountManager am);
+  public abstract Optional<TransactionResponse> apply(IAccountManager am);
 }

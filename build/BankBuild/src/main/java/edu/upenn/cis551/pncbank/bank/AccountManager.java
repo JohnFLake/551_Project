@@ -26,7 +26,7 @@ public class AccountManager implements IAccountManager {
    *         number as the request.
    */
   public Optional<TransactionResponse> apply(AbstractRequest t) {
-    return t.apply(t.getAccountName(), this);
+    return t.apply(this);
   }
 
   /**

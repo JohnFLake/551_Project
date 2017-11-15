@@ -29,8 +29,8 @@ public class BalanceRequest extends AbstractRequest {
   }
 
   @Override
-  public Optional<TransactionResponse> apply(String accountName, IAccountManager am) {
-    return Optional.of(am.get(accountName)
+  public Optional<TransactionResponse> apply(IAccountManager am) {
+    return Optional.of(am.get(this.getAccountName())
         .filter(a -> a.getCardValidator().equals(this.getValidation()))
         .filter(a -> a.getSequence() == this.getSequenceNumber())
         .map(a -> (TransactionResponse) new BalanceResponse(true, this.getAccountName(),

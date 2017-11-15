@@ -18,8 +18,8 @@ public class AckRequest extends AbstractRequest {
   }
 
   @Override
-  public Optional<TransactionResponse> apply(String accountName, IAccountManager am) {
-    am.get(accountName).ifPresent(account -> account.commit(this.getSequenceNumber()));
+  public Optional<TransactionResponse> apply(IAccountManager am) {
+    am.get(this.getAccountName()).ifPresent(account -> account.commit(this.getSequenceNumber()));
     return Optional.empty();
   }
 
