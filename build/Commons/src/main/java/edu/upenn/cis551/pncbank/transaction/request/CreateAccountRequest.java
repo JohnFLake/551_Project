@@ -2,7 +2,7 @@ package edu.upenn.cis551.pncbank.transaction.request;
 
 import java.util.Optional;
 import edu.upenn.cis551.pncbank.bank.Account;
-import edu.upenn.cis551.pncbank.bank.IAccountManager;
+import edu.upenn.cis551.pncbank.bank.AccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.PrintUtils;
 
@@ -43,7 +43,7 @@ public class CreateAccountRequest extends AbstractRequest {
   }
 
   @Override
-  public Optional<TransactionResponse> apply(IAccountManager am) {
+  public Optional<TransactionResponse> apply(AccountManager am) {
     TransactionResponse r = am.createAccount(this.getAccountName(), this.getValidator(),
         this.getSequenceNumber(), this.getBalance()).map(acct -> {
           return new TransactionResponse(true, this.getAccountName(), this.getSequenceNumber());

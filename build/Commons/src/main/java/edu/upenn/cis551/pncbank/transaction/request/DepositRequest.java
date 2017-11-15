@@ -3,7 +3,7 @@ package edu.upenn.cis551.pncbank.transaction.request;
 import java.math.BigInteger;
 import java.util.Optional;
 import edu.upenn.cis551.pncbank.bank.Account;
-import edu.upenn.cis551.pncbank.bank.IAccountManager;
+import edu.upenn.cis551.pncbank.bank.AccountManager;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.PrintUtils;
 
@@ -43,7 +43,7 @@ public class DepositRequest extends AbstractRequest {
   }
 
   @Override
-  public Optional<TransactionResponse> apply(IAccountManager am) {
+  public Optional<TransactionResponse> apply(AccountManager am) {
     Optional<Account> oa = am.get(this.getAccountName(), this.getSequenceNumber());
     TransactionResponse r = oa.filter(a -> a.getCardValidator().equals(this.getValidation()))
         .filter(a -> a.getSequence() == this.getSequenceNumber())//

@@ -8,7 +8,7 @@ import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
 import edu.upenn.cis551.pncbank.transaction.request.CreateAccountRequest;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 
-public class AccountManager implements IAccountManager {
+public class AccountManager {
   Map<String, Account> accounts;
 
   private Map<String, Account> pending;
@@ -18,9 +18,26 @@ public class AccountManager implements IAccountManager {
     this.pending = new HashMap<>();
   }
 
-  @Override
+  /**
+   * @param accountName
+   * @return An Optional containing the account matching that name.
+   */
+  public Optional<Account> get(String accountName) {
+    return Optional.ofNullable(this.accounts.get(accountName));
+  }
+
+  /**
+   * Gets an account iff it exists and the sequence number matches. If the account is pending with
+   * the previous sequence number, the account is first committed.
+   * 
+   * @param accountName
+   * @param s
+   * @return An Optional containing the matching account.
+   */
   public Optional<Account> get(String accountName, long s) {
-    if (this.pending.containsKey(accounts)
+    // If something is asking for the pending account with the previous sequence number, it must
+    // have thought the creation succeeded and sent an ack. Finish the pending call.
+    if (this.pending.containsKey(accountName)
         && this.pending.get(accountName).getSequence() == s - 1) {
       this.commitAccount(accountName);
     }
@@ -38,6 +55,12 @@ public class AccountManager implements IAccountManager {
     return t.apply(this);
   }
 
+  /**
+   * Commits an account after an acknowledgement.
+   * 
+   * @param accountName
+   * @return
+   */
   public synchronized boolean commitAccount(String accountName) {
     Account a = this.pending.get(accountName);
     if (null != a) {
@@ -71,5 +94,9 @@ public class AccountManager implements IAccountManager {
       this.pending.put(accountId, result);
       return Optional.of(result);
     }
+  }
+
+  public boolean isPending(String accountId) {
+    return this.pending.containsKey(accountId);
   }
 }
