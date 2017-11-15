@@ -32,6 +32,10 @@ public class Atm {
 
     Session session;
 
+    if (!cmd.getArgList().isEmpty()) {
+      System.exit(255);
+    }
+
     // MAKE ACCOUNT:
     if (cmd.hasOption("n")) {
 
@@ -86,6 +90,9 @@ public class Atm {
 
     // GET BALANCE:
     else if (cmd.hasOption("g")) {
+      if (cmd.getOptionValue("g") != null) {
+        System.exit(255);
+      }
       session = new Session(this.ip, this.port, this.key, cardString);
       return Client.checkBalance(session, accountName);
     }
