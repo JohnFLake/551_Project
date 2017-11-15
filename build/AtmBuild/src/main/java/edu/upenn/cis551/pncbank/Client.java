@@ -86,7 +86,7 @@ public class Client {
 
 
   public static void newAccount(Session session, String accountName, long balance) {
-    if (balance < 10) {
+    if (balance < 1000) {
       System.exit(255);
     }
 
@@ -132,7 +132,7 @@ public class Client {
 
   public static boolean Withdraw(Session session, String accountName, long withdraw)
       throws IOException {
-    if (withdraw < 0) {
+    if (withdraw <= 0) {
       System.exit(255);
     }
 

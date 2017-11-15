@@ -22,6 +22,7 @@ import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
 import edu.upenn.cis551.pncbank.transaction.response.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Bank implements AutoCloseable {
 
@@ -133,12 +134,21 @@ public class Bank implements AutoCloseable {
       o.addOption("s", true, "The name of the auth file");
       CommandLine cl = clp.parse(o, args);
       authFileName = cl.getOptionValue("s", DEFAULT_BANK_AUTH);
+      if (!InputValidator.isValidFile(authFileName)) {
+        System.err.println("Invalid auth file: " + authFileName);
+        System.exit(255);
+      }
       bankPort = Integer.parseInt(cl.getOptionValue("p", DEFAULT_BANK_PORT), 10);
+      if (!InputValidator.isValidPortNumber(bankPort + "")) {
+        System.err.println("Invalid port: " + bankPort);
+        System.exit(255);
+      }
       bankKey = Authentication.generateAuthFile(authFileName);
-      System.out.println("Created");
+      System.out.print("created\n");
       System.out.flush();
     } catch (ParseException | NumberFormatException | EncryptionException | IOException e) {
       // Failed to parse args or to generate the authfile.
+      System.err.println(e.getMessage());
       System.exit(255);
       return;
     }
@@ -150,6 +160,7 @@ public class Bank implements AutoCloseable {
       bank.start();
     } catch (IOException e1) {
       // Failed to bind to the specified port
+      System.err.println(e1.getMessage());
       System.exit(255);
       return;
     }

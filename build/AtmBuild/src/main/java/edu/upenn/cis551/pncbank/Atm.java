@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import edu.upenn.cis551.pncbank.exception.NoRequestException;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Atm {
 
@@ -30,6 +31,10 @@ public class Atm {
     long amount = 0;
 
     Session session;
+
+    if (!cmd.getArgList().isEmpty()) {
+      System.exit(255);
+    }
 
     // MAKE ACCOUNT:
     if (cmd.hasOption("n")) {
@@ -85,6 +90,9 @@ public class Atm {
 
     // GET BALANCE:
     else if (cmd.hasOption("g")) {
+      if (cmd.getOptionValue("g") != null) {
+        System.exit(255);
+      }
       session = new Session(this.ip, this.port, this.key, cardString);
       return Client.checkBalance(session, accountName);
     }

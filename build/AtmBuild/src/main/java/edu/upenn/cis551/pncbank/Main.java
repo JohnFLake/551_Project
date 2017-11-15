@@ -3,14 +3,17 @@
 package edu.upenn.cis551.pncbank;
 
 import java.io.IOException;
+import java.util.HashSet;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.exception.NoRequestException;
+import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Main {
 
@@ -117,6 +120,17 @@ public class Main {
     // Attempt to parse commands and start an atm transaction:
     try {
       CommandLine cmd = parseOptions(options, args);
+
+      // Make sure each option is at most used once.
+      HashSet<String> seenOptions = new HashSet<>();
+      for (Option o : cmd.getOptions()) {
+        if (seenOptions.contains(o.getOpt())) {
+          System.exit(255);
+        } else {
+          seenOptions.add(o.getOpt());
+        }
+      }
+
 
       // Have the ATM perform the correct action.
       Atm a = new Atm(cmd, IP, port, cardFile, accountName, authKey);

@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar BankBuild/target/BankBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
+java -jar /home/builder/submission/build/BankBuild/target/BankBuild-0.0.1-SNAPSHOT-jar-with-dependencies.jar $@
