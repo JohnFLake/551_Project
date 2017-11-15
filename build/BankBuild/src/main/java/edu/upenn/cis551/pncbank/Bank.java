@@ -143,6 +143,7 @@ public class Bank implements AutoCloseable {
       System.out.flush();
     } catch (ParseException | NumberFormatException | EncryptionException | IOException e) {
       // Failed to parse args or to generate the authfile.
+      System.err.println(e.getMessage());
       System.exit(255);
       return;
     }
@@ -154,6 +155,7 @@ public class Bank implements AutoCloseable {
       bank.start();
     } catch (IOException e1) {
       // Failed to bind to the specified port
+      System.err.println(e1.getMessage());
       System.exit(255);
       return;
     }
