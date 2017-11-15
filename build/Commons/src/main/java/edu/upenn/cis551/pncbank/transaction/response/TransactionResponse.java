@@ -1,4 +1,4 @@
-package edu.upenn.cis551.pncbank.transaction;
+package edu.upenn.cis551.pncbank.transaction.response;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;

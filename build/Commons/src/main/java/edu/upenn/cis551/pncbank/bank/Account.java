@@ -1,6 +1,7 @@
 package edu.upenn.cis551.pncbank.bank;
 
 import java.math.BigInteger;
+import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
 
 /**
  * Representation of an account. Provides methods for adding or removing value from the account
@@ -17,6 +18,8 @@ public class Account {
   BigInteger balance;
   String cardValidator;
   long sequence;
+
+  AbstractRequest pending = null;
 
   public Account(String validator, long sequence) {
     this.balance = BigInteger.ZERO;
@@ -47,13 +50,12 @@ public class Account {
 
   /**
    * Updates the value in the account. The caller is responsible for making sure that the update is
-   * validated by the validator and the sequence number (which is why the method is package
-   * private).
+   * validated by the validator and the sequence number.
    * 
    * @param delta The change to make on the account value
    * @return false iff the amount results in a negative balance.
    */
-  boolean updateValueAndIncrementSeq(long delta) {
+  public boolean updateValueAndIncrementSeq(long delta) {
     BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
     if (newVal.compareTo(BigInteger.ZERO) < 0) {
       return false;
@@ -71,5 +73,15 @@ public class Account {
   public String readValueTransaction() {
     this.sequence++;
     return this.balance.toString();
+  }
+
+
+  /**
+   * Commits the pending transaction with the correct sequence number
+   * 
+   * @param s The sequence number of the transaction to commit.
+   */
+  public void commit(long s) {
+    // TODO
   }
 }
