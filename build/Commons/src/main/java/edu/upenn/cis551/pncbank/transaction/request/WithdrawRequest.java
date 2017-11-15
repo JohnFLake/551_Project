@@ -69,7 +69,19 @@ public class WithdrawRequest extends AbstractRequest {
   public void commit(Optional<Account> account) {
     account.ifPresent(
         a -> a.setBalance(a.getBalance().subtract(BigInteger.valueOf(this.getWithdraw()))));
-    System.out.println(this.toString());
-    System.out.flush();
+  }
+
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof WithdrawRequest))
+      return false;
+    WithdrawRequest r = (WithdrawRequest) other;
+    return Optional.ofNullable(r.getAccountName())
+        .filter(name -> name.equals(this.getAccountName())).isPresent()
+        && r.getSequenceNumber() == this.getSequenceNumber()
+        && Optional.ofNullable(r.getValidation()).filter(val -> val.equals(this.getValidation()))
+            .isPresent()
+        && this.getWithdraw() == r.getWithdraw();
   }
 }

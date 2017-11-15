@@ -62,7 +62,18 @@ public class DepositRequest extends AbstractRequest {
   @Override
   public void commit(Optional<Account> account) {
     account.ifPresent(a -> a.setBalance(a.getBalance().add(BigInteger.valueOf(this.getDeposit()))));
-    System.out.println(this.toString());
-    System.out.flush();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof DepositRequest))
+      return false;
+    DepositRequest r = (DepositRequest) other;
+    return Optional.ofNullable(r.getAccountName())
+        .filter(name -> name.equals(this.getAccountName())).isPresent()
+        && r.getSequenceNumber() == this.getSequenceNumber()
+        && Optional.ofNullable(r.getValidation()).filter(val -> val.equals(this.getValidation()))
+            .isPresent()
+        && this.getDeposit() == r.getDeposit();
   }
 }

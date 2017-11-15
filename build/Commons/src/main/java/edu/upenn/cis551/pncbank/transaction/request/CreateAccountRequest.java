@@ -58,4 +58,17 @@ public class CreateAccountRequest extends AbstractRequest {
     // Shouldn't be called
   }
 
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof CreateAccountRequest))
+      return false;
+    CreateAccountRequest r = (CreateAccountRequest) other;
+    return Optional.ofNullable(r.getAccountName())
+        .filter(name -> name.equals(this.getAccountName())).isPresent()
+        && r.getSequenceNumber() == this.getSequenceNumber() //
+        && Optional.ofNullable(r.getValidator()).filter(val -> val.equals(this.getValidator()))
+            .isPresent()
+        && this.getBalance() == r.getBalance();
+  }
+
 }

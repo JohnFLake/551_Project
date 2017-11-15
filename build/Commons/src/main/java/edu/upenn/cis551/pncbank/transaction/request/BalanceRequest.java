@@ -47,14 +47,19 @@ public class BalanceRequest extends AbstractRequest {
 
   @Override
   public void commit(Optional<Account> account) {
-    account.ifPresent(a -> {
-      StringBuilder sb = new StringBuilder();
-      sb.append('{');
-      sb.append("\"balance\":").append(PrintUtils.writeCurrency(a.getBalance().toString()))
-          .append(',');
-      sb.append("\"account\":\"").append(this.getAccountName()).append("\"}");
-      System.out.println(sb.toString());
-      System.out.flush();
-    });
+    // Nothing needs to be done
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof BalanceRequest)) {
+      return false;
+    }
+    BalanceRequest r = (BalanceRequest) other;
+    return Optional.ofNullable(r.getAccountName())
+        .filter(name -> name.equals(this.getAccountName())).isPresent()
+        && r.getSequenceNumber() == this.getSequenceNumber()
+        && Optional.ofNullable(r.getValidation()).filter(val -> val.equals(this.getValidation()))
+            .isPresent();
   }
 }

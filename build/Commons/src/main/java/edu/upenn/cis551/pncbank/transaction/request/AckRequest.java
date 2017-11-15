@@ -15,6 +15,13 @@ public class AckRequest extends AbstractRequest {
 
   private AbstractRequest request;
 
+  /**
+   * Private constructor for use by Jackson
+   */
+  private AckRequest() {
+    super(null, 0l);
+  }
+
   public AckRequest(AbstractRequest request) {
     super(request.getAccountName(), request.getSequenceNumber());
     this.request = request;

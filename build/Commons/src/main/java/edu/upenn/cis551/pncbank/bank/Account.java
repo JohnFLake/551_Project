@@ -3,6 +3,8 @@ package edu.upenn.cis551.pncbank.bank;
 import java.math.BigInteger;
 import java.util.Optional;
 import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
+import edu.upenn.cis551.pncbank.transaction.request.BalanceRequest;
+import edu.upenn.cis551.pncbank.utils.PrintUtils;
 
 /**
  * Representation of an account. Provides methods for adding or removing value from the account
@@ -62,6 +64,18 @@ public class Account {
   public void commit(AbstractRequest transaction) {
     if (this.pending != null && this.pending.equals(transaction)) {
       this.pending.commit(Optional.of(this));
+      if (this.pending instanceof BalanceRequest) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        sb.append("\"balance\":").append(PrintUtils.writeCurrency(this.getBalance().toString()))
+            .append(',');
+        sb.append("\"account\":").append(transaction.getAccountName());
+        sb.append('}');
+        System.out.println(sb.toString());
+      } else {
+        System.out.println(this.pending.toString());
+      }
+      System.out.flush();
       this.sequence++;
       this.pending = null;
     }

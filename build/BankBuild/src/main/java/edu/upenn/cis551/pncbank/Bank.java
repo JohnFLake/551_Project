@@ -20,7 +20,6 @@ import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
-import edu.upenn.cis551.pncbank.transaction.response.BalanceResponse;
 import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.InputValidator;
 
@@ -92,7 +91,6 @@ public class Bank implements AutoCloseable {
 
       AbstractRequest r = this.mapper.readValue(decrypted, AbstractRequest.class);
       Optional<TransactionResponse> tr = am.apply(r);
-      printTransactionResults(r, tr);
       if (tr.isPresent()) {
         byte[] serialized = this.mapper.writeValueAsBytes(tr.get());
         byte[] toSend = encryption.encrypt(serialized, this.bankKey);
@@ -103,24 +101,6 @@ public class Bank implements AutoCloseable {
       System.out.println("protocol_error");
       System.out.flush();
     }
-  }
-
-  static void printTransactionResults(AbstractRequest t, Optional<TransactionResponse> or) {
-    if (!or.isPresent()) {
-      return;
-    }
-    TransactionResponse r = or.get();
-    if (r.isOk()) {
-      if (r instanceof BalanceResponse) {
-        // special case for balance
-        System.out.println(r.toString());
-      } else {
-        System.out.println(t.toString());
-      }
-    } else {
-      // System.out.println("protocol_error");
-    }
-    System.out.flush();
   }
 
   public static void main(String[] args) {
