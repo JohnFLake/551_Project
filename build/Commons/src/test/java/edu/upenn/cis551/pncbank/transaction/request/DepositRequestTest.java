@@ -59,7 +59,7 @@ public class DepositRequestTest {
     // Run
     Optional<TransactionResponse> ot = am.apply(deposit);
     // Ack
-    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(deposit));
 
     // Verify
     // State is changed
@@ -93,7 +93,7 @@ public class DepositRequestTest {
     // Run
     Optional<TransactionResponse> ot = am.apply(deposit);
     // Ack
-    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(deposit));
 
     // Verify
     // State is changed
@@ -148,7 +148,7 @@ public class DepositRequestTest {
     acctSequence++;
 
     DepositRequest deposit = new DepositRequest(accountName, validator, 100, reqSequence);
-    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(deposit));
 
     // Run
     Optional<TransactionResponse> ot = am.apply(deposit);
@@ -183,7 +183,7 @@ public class DepositRequestTest {
     am.commitAccount(accountName);
     sequence++;
     DepositRequest deposit = new DepositRequest(accountName, validator2, amount, sequence);
-    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(deposit));
 
     // Run
     Optional<TransactionResponse> ot = am.apply(deposit);
@@ -217,7 +217,7 @@ public class DepositRequestTest {
     am.commitAccount(accountName);
     sequence++;
     DepositRequest deposit = new DepositRequest(accountName, validator, amount, sequence);
-    oa.ifPresent(a -> a.commit(deposit.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(deposit));
 
     // Run
     Optional<TransactionResponse> ot = am.apply(deposit);

@@ -49,11 +49,11 @@ public class WithdrawRequestTest {
     Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
     test.commitAccount(accountName);
     sequence++;
-    WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
+    WithdrawRequest withdraw = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
-    Optional<TransactionResponse> ot = test.apply(deposit);
-    oa.get().commit(sequence);
+    Optional<TransactionResponse> ot = test.apply(withdraw);
+    oa.get().commit(withdraw);
 
     // Verify
     // State is changed
@@ -109,11 +109,11 @@ public class WithdrawRequestTest {
     Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
     test.commitAccount(accountName);
     sequence++;
-    WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
+    WithdrawRequest withdraw = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
-    Optional<TransactionResponse> ot = test.apply(deposit);
-    oa.get().commit(sequence);
+    Optional<TransactionResponse> ot = test.apply(withdraw);
+    oa.get().commit(withdraw);
 
     // Verify
     // State is unchanged
@@ -144,11 +144,11 @@ public class WithdrawRequestTest {
     Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
     test.commitAccount(accountName);
     sequence++;
-    WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, sequence);
+    WithdrawRequest withdraw = new WithdrawRequest(accountName, validator, amount, sequence);
 
     // Run
-    Optional<TransactionResponse> ot = test.apply(deposit);
-    oa.get().commit(sequence);
+    Optional<TransactionResponse> ot = test.apply(withdraw);
+    oa.get().commit(withdraw);
 
     // Verify
     // State is unchanged
@@ -180,11 +180,11 @@ public class WithdrawRequestTest {
     Optional<Account> oa = test.createAccount(accountName, validator, sequence, oldBalance);
     test.commitAccount(accountName);
     sequence++;
-    WithdrawRequest deposit = new WithdrawRequest(accountName, validator2, amount, sequence);
+    WithdrawRequest withdraw = new WithdrawRequest(accountName, validator2, amount, sequence);
 
     // Run
-    Optional<TransactionResponse> ot = test.apply(deposit);
-    oa.get().commit(sequence);
+    Optional<TransactionResponse> ot = test.apply(withdraw);
+    oa.get().commit(withdraw);
 
     // Verify
     // State is unchanged
@@ -216,11 +216,11 @@ public class WithdrawRequestTest {
     Optional<Account> oa = test.createAccount(accountName, validator, accountSequence, oldBalance);
     test.commitAccount(accountName);
     accountSequence++;
-    WithdrawRequest deposit = new WithdrawRequest(accountName, validator, amount, reqSequence);
+    WithdrawRequest withdraw = new WithdrawRequest(accountName, validator, amount, reqSequence);
 
     // Run
-    Optional<TransactionResponse> ot = test.apply(deposit);
-    oa.get().commit(reqSequence);
+    Optional<TransactionResponse> ot = test.apply(withdraw);
+    oa.get().commit(withdraw);
 
     // Verify
     // State is unchanged

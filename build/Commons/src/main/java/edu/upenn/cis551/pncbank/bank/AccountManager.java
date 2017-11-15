@@ -46,8 +46,13 @@ public class AccountManager {
     }
     Account a = this.accounts.get(accountName);
     return Optional.ofNullable(a).filter(acct -> {
-      acct.commit(s - 1); // First commit any pending transactions with the previous sequence
-                          // number, as this may change the account's sequence number expectation.
+      if (null != acct.pending && acct.pending.getSequenceNumber() == s - 1) {
+        acct.commit(acct.pending); // First commit any pending transactions with the previous
+                                   // sequence number, as this may change the account's sequence
+                                   // number expectation.
+        // This is safe since the only way a request can come in with the next sequence number is if
+        // the atm got an ok response to the previous one.
+      }
       return acct.getSequence() == s;
     });
   }

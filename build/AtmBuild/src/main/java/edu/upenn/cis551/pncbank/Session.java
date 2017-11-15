@@ -50,32 +50,38 @@ public class Session {
    * @throws Exception
    */
   public static byte[] writeToAndReadFromSocket(Socket socket, byte[] writeTo) throws IOException {
-    try (OutputStream os = socket.getOutputStream()) {
 
-      // write raw bytes to socket.
-      os.write(writeTo);
-      os.flush();
-      socket.shutdownOutput();
+    // write raw bytes to socket.
+    writeToSocket(socket, writeTo);
+    socket.shutdownOutput();
 
-      // read raw bytes from socket:
-      InputStream is = socket.getInputStream();
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      int next = is.read();
-      while (next > -1) {
-        bos.write(next);
-        next = is.read();
-      }
-      bos.flush();
-      byte[] result = bos.toByteArray();
-
-      socket.close();
-      return result;
-
-    } catch (IOException e) {
-      throw e;
+    // read raw bytes from socket:
+    InputStream is = socket.getInputStream();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    int next = is.read();
+    while (next > -1) {
+      bos.write(next);
+      next = is.read();
     }
+    bos.flush();
+    byte[] result = bos.toByteArray();
+
+    socket.close();
+    return result;
+
   }
 
-
+  /**
+   * Writes bytes to a socket's output.
+   * 
+   * @param socket
+   * @param writeTo The bytes to write.
+   * @throws IOException On some IO failure, such as the socket being closed.
+   */
+  public static void writeToSocket(Socket socket, byte[] writeTo) throws IOException {
+    OutputStream os = socket.getOutputStream();
+    os.write(writeTo);
+    os.flush();
+  }
 
 }

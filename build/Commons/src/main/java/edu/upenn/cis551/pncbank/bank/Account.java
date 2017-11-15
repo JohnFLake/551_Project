@@ -59,8 +59,8 @@ public class Account {
    * 
    * @param s The sequence number of the transaction to commit.
    */
-  public void commit(long s) {
-    if (this.pending != null && this.pending.getSequenceNumber() == s) {
+  public void commit(AbstractRequest transaction) {
+    if (this.pending != null && this.pending.equals(transaction)) {
       this.pending.commit(Optional.of(this));
       this.sequence++;
       this.pending = null;

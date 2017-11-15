@@ -151,7 +151,7 @@ public class AccountManagerTest {
 
     // Run
     am.apply(deposit2);
-    a.commit(sequence);
+    a.commit(deposit2);
     sequence++;
 
     // Verify
@@ -189,7 +189,7 @@ public class AccountManagerTest {
 
     // Run
     am.apply(deposit2);
-    a.commit(sequence);
+    a.commit(deposit2);
     sequence++;
 
     // Verify

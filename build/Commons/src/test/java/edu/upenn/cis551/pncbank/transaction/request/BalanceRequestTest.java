@@ -33,7 +33,7 @@ public class BalanceRequestTest {
 
     // Run
     Optional<TransactionResponse> ot = am.apply(bal);
-    oa.ifPresent(a -> a.commit(bal.getSequenceNumber()));
+    oa.ifPresent(a -> a.commit(bal));
 
     // Verify
     // State is changed (only sequence number)
@@ -73,7 +73,7 @@ public class BalanceRequestTest {
     // Run
     Optional<TransactionResponse> ot = am.apply(bal);
     Assert.assertFalse(am.isPending(accountName));
-    am.get(accountName, sequence).ifPresent(a -> a.commit(bal.getSequenceNumber()));
+    am.get(accountName, sequence).ifPresent(a -> a.commit(bal));
 
     // Verify
     // State is changed (only sequence number)
@@ -131,7 +131,7 @@ public class BalanceRequestTest {
     am.commitAccount(accountName);
     sequence++;
     BalanceRequest bal = new BalanceRequest(accountName, validator, reqSequence);
-    oa.ifPresent(a -> a.commit(bal.sequenceNumber));
+    oa.ifPresent(a -> a.commit(bal));
 
     // Run
     Optional<TransactionResponse> ot = am.apply(bal);
@@ -168,7 +168,7 @@ public class BalanceRequestTest {
 
     // Run
     Optional<TransactionResponse> ot = am.apply(bal);
-    oa.ifPresent(a -> a.commit(bal.sequenceNumber));
+    oa.ifPresent(a -> a.commit(bal));
 
     // Verify
     // State is unchanged

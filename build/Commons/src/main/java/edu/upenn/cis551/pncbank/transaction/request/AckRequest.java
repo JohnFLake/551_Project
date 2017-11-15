@@ -13,15 +13,21 @@ import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
  */
 public class AckRequest extends AbstractRequest {
 
-  // Needs no additional information
-  public AckRequest(String accountName, long sequenceNumber) {
-    super(accountName, sequenceNumber);
+  private AbstractRequest request;
+
+  public AckRequest(AbstractRequest request) {
+    super(request.getAccountName(), request.getSequenceNumber());
+    this.request = request;
+  }
+
+  public AbstractRequest getRequest() {
+    return this.request;
   }
 
   @Override
   public Optional<TransactionResponse> apply(AccountManager am) {
     am.commitAccount(this.getAccountName());
-    am.get(accountName, this.sequenceNumber).ifPresent(a -> a.commit(this.sequenceNumber));
+    am.get(accountName, this.sequenceNumber).ifPresent(a -> a.commit(this.getRequest()));
     return Optional.empty();
   }
 

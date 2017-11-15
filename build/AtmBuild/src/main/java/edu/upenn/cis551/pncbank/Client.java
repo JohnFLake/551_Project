@@ -12,6 +12,7 @@ import edu.upenn.cis551.pncbank.encryption.CardFile;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
 import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
+import edu.upenn.cis551.pncbank.transaction.request.AckRequest;
 import edu.upenn.cis551.pncbank.transaction.request.BalanceRequest;
 import edu.upenn.cis551.pncbank.transaction.request.CreateAccountRequest;
 import edu.upenn.cis551.pncbank.transaction.request.DepositRequest;
@@ -21,10 +22,10 @@ import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
 public class Client {
   static IEncryption<SecretKey, SecretKey> encryption = new AESEncryption();
 
-  public static TransactionResponse sendPOJO(AbstractRequest pojo, Session session) {
+  public static TransactionResponse sendPOJO(AbstractRequest pojo, Session session,
+      boolean resonseExpected) {
 
     ObjectMapper objectMapper = new ObjectMapper();
-    Socket AtmBank = null;
 
     // Encrypt this POJO:
     SecretKey encryptKey = session.getsecretkey();
@@ -35,11 +36,16 @@ public class Client {
       System.exit(255);
     }
 
-    try {
-      AtmBank = new Socket(session.getIP(), session.getPort());
+    try (Socket AtmBank = new Socket(session.getIP(), session.getPort())) {
+
       AtmBank.setSoTimeout(10 * 1000);
 
       // Send the encrypted bytes and receive a response:
+      if (!resonseExpected) {
+        Session.writeToSocket(AtmBank, encrypted);
+        return null;
+      }
+
       byte[] response = Session.writeToAndReadFromSocket(AtmBank, encrypted);
 
       // The response is encrypted. we need to decrypt it.
@@ -100,13 +106,13 @@ public class Client {
 
 
     // Make pojo to send.
-    CreateAccountRequest pojo =
-        new CreateAccountRequest(accountName, newCard.getPin(), balance, newCard.getSequenceNumber());
+    CreateAccountRequest pojo = new CreateAccountRequest(accountName, newCard.getPin(), balance,
+        newCard.getSequenceNumber());
 
 
     // Send pojo and get response. Print it.
-    TransactionResponse tResponse = sendPOJO(pojo, session);
-    handleResponse(pojo, tResponse, newCard, session.getCard());
+    TransactionResponse tResponse = sendPOJO(pojo, session, true);
+    handleResponse(pojo, tResponse, newCard, session.getCard(), session);
     // Note, there's no way that the bank can suggest a retry for this type of request.
   }
 
@@ -126,8 +132,8 @@ public class Client {
         new DepositRequest(accountName, checkCard.getPin(), deposit, checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
-    TransactionResponse tResponse = sendPOJO(pojo, session);
-    return handleResponse(pojo, tResponse, checkCard, session.getCard());
+    TransactionResponse tResponse = sendPOJO(pojo, session, true);
+    return handleResponse(pojo, tResponse, checkCard, session.getCard(), session);
   }
 
   public static boolean Withdraw(Session session, String accountName, long withdraw)
@@ -143,12 +149,12 @@ public class Client {
 
     CardFile checkCard = Authentication.getCardFile(session.getCard());
 
-    WithdrawRequest pojo =
-        new WithdrawRequest(accountName, checkCard.getPin(), withdraw, checkCard.getSequenceNumber());
+    WithdrawRequest pojo = new WithdrawRequest(accountName, checkCard.getPin(), withdraw,
+        checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
-    TransactionResponse tResponse = sendPOJO(pojo, session);
-    return handleResponse(pojo, tResponse, checkCard, session.getCard());
+    TransactionResponse tResponse = sendPOJO(pojo, session, true);
+    return handleResponse(pojo, tResponse, checkCard, session.getCard(), session);
 
   }
 
@@ -166,8 +172,12 @@ public class Client {
         new BalanceRequest(accountName, checkCard.getPin(), checkCard.getSequenceNumber());
 
     // Send pojo and get response. Print it.
-    TransactionResponse tResponse = sendPOJO(pojo, session);
-    return handleResponse(pojo, tResponse, checkCard, session.getCard());
+    TransactionResponse tResponse = sendPOJO(pojo, session, true);
+    return handleResponse(pojo, tResponse, checkCard, session.getCard(), session);
+  }
+
+  private static void sendAck(Session session, AbstractRequest request) throws IOException {
+    sendPOJO(new AckRequest(request), session, false);
   }
 
   /**
@@ -180,11 +190,12 @@ public class Client {
    * @param response
    * @param card
    * @param cardName
+   * @param session The session. Used to send Acks.
    * @return <code>true</code> if the transaction is successful, or <code>false</code> if the
    *         transaction failed due to obsolete sequence number.
    */
   private static boolean handleResponse(AbstractRequest request, TransactionResponse response,
-      CardFile card, String cardName) {
+      CardFile card, String cardName, Session session) {
     if (response.isOk()) {
       if (request instanceof BalanceRequest) {
         System.out.println(response.toString());
@@ -193,6 +204,11 @@ public class Client {
       }
       System.out.flush();
       updateCardSeqNumber(card, cardName, response.getSequence() + 1);
+      try {
+        sendAck(session, request);
+      } catch (IOException e) {
+        // Not an issue, since a missed ack is recoverable
+      }
       return true;
     } else {
       // Bank failed the transaction.
