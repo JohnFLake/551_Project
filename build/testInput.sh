@@ -14,13 +14,12 @@ echo "Port number 1023: " $?
 ./bank -p65536
 echo "Port number 65536: " $?
 
-./bank &
-last_pid=$!
-sleep 3
-kill -KILL $last_pid > /dev/null
-
+echo "gibberish" > bank.auth
 ./bank
 echo "bank.auth already exists: " $?
+rm bank.auth
 
 ./bank -s
 echo "No bank.auth given: " $?
+
+
