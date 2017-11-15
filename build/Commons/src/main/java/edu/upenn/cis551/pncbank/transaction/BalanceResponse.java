@@ -1,4 +1,4 @@
-package edu.upenn.cis551.pncbank.transaction.response;
+package edu.upenn.cis551.pncbank.transaction;
 
 public class BalanceResponse extends TransactionResponse {
   /**
