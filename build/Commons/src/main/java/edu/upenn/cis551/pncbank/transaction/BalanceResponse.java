@@ -1,4 +1,4 @@
-package edu.upenn.cis551.pncbank.transaction.response;
+package edu.upenn.cis551.pncbank.transaction;
 
 public class BalanceResponse extends TransactionResponse {
   /**
@@ -27,8 +27,8 @@ public class BalanceResponse extends TransactionResponse {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append('{');
-    sb.append("\"balance\":").append(this.getBalance()).append(',');
-    sb.append("\"account\":").append(this.getAccountId());
+    sb.append("\"account\": \"").append(this.getAccountId()).append("\", ");
+    sb.append("\"balance\": ").append(this.getBalance());
     sb.append('}');
     return sb.toString();
   }

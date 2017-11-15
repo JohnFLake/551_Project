@@ -26,20 +26,4 @@ public class PrintUtils {
       return String.format("%d.%02d", dollars, cents);
     }
   }
-
-  /**
-   * Version of writeCurrency where the input is a string, to handle really large values.
-   * 
-   * @param valAsCents The value, as a String.
-   * @return The value in dollars
-   */
-  public static String writeCurrency(String valAsCents) {
-    if (valAsCents.length() <= 2) {
-      // Balance is just in cents
-      return String.format("0.%02d", Integer.parseInt(valAsCents, 10));
-    } else {
-      return valAsCents.substring(0, valAsCents.length() - 2) + '.'
-          + valAsCents.substring(valAsCents.length() - 2);
-    }
-  }
 }

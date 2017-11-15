@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,9 +18,9 @@ import edu.upenn.cis551.pncbank.encryption.AESEncryption;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.encryption.EncryptionException;
 import edu.upenn.cis551.pncbank.encryption.IEncryption;
-import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
-import edu.upenn.cis551.pncbank.transaction.response.BalanceResponse;
-import edu.upenn.cis551.pncbank.transaction.response.TransactionResponse;
+import edu.upenn.cis551.pncbank.transaction.AbstractTransaction;
+import edu.upenn.cis551.pncbank.transaction.BalanceResponse;
+import edu.upenn.cis551.pncbank.transaction.TransactionResponse;
 import edu.upenn.cis551.pncbank.utils.InputValidator;
 
 public class Bank implements AutoCloseable {
@@ -98,6 +97,7 @@ public class Bank implements AutoCloseable {
         byte[] toSend = encryption.encrypt(serialized, this.bankKey);
         out.write(toSend);
       }
+
     } catch (EncryptionException | IOException e) {
       // Also catches SocketTimeoutExceptions due to read timeouts.
       System.out.println("protocol_error");
@@ -105,11 +105,7 @@ public class Bank implements AutoCloseable {
     }
   }
 
-  static void printTransactionResults(AbstractRequest t, Optional<TransactionResponse> or) {
-    if (!or.isPresent()) {
-      return;
-    }
-    TransactionResponse r = or.get();
+  static void printTransactionResults(AbstractTransaction t, TransactionResponse r) {
     if (r.isOk()) {
       if (r instanceof BalanceResponse) {
         // special case for balance
@@ -118,7 +114,7 @@ public class Bank implements AutoCloseable {
         System.out.println(t.toString());
       }
     } else {
-      System.out.println("protocol_error");
+      // System.out.println("protocol_error");
     }
     System.out.flush();
   }

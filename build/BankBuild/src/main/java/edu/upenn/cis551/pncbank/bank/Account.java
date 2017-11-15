@@ -1,8 +1,6 @@
 package edu.upenn.cis551.pncbank.bank;
 
 import java.math.BigInteger;
-import java.util.Optional;
-import edu.upenn.cis551.pncbank.transaction.request.AbstractRequest;
 
 /**
  * Representation of an account. Provides methods for adding or removing value from the account
@@ -20,8 +18,6 @@ public class Account {
   String cardValidator;
   long sequence;
 
-  AbstractRequest pending = null;
-
   public Account(String validator, long sequence) {
     this.balance = BigInteger.ZERO;
     this.cardValidator = validator;
@@ -33,10 +29,6 @@ public class Account {
    */
   public final BigInteger getBalance() {
     return this.balance;
-  }
-
-  public final void setBalance(BigInteger i) {
-    this.balance = i;
   }
 
   /**
@@ -53,25 +45,31 @@ public class Account {
     return this.sequence;
   }
 
+  /**
+   * Updates the value in the account. The caller is responsible for making sure that the update is
+   * validated by the validator and the sequence number (which is why the method is package
+   * private).
+   * 
+   * @param delta The change to make on the account value
+   * @return false iff the amount results in a negative balance.
+   */
+  boolean updateValueAndIncrementSeq(long delta) {
+    BigInteger newVal = this.balance.add(BigInteger.valueOf(delta));
+    if (newVal.compareTo(BigInteger.ZERO) < 0) {
+      return false;
+    }
+    this.balance = newVal;
+    this.sequence++;
+    return true;
+  }
 
   /**
-   * Commits the pending transaction with the correct sequence number
+   * Reads the balance of the account and increases the sequence number.
    * 
-   * @param s The sequence number of the transaction to commit.
+   * @return The String representation of the balance.
    */
-  public void commit(AbstractRequest transaction) {
-    if (this.pending != null && this.pending.equals(transaction)) {
-      this.pending.commit(Optional.of(this));
-      this.sequence++;
-      this.pending = null;
-    }
-  }
-
-  public void defer(AbstractRequest r) {
-    this.pending = r;
-  }
-
-  public void incrementSequence() {
+  public String readValueTransaction() {
     this.sequence++;
+    return this.balance.toString();
   }
 }
