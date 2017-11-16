@@ -67,9 +67,8 @@ public class Account {
       if (this.pending instanceof BalanceRequest) {
         StringBuilder sb = new StringBuilder();
         sb.append('{');
-        sb.append("\"balance\":").append(PrintUtils.writeCurrency(this.getBalance().toString()))
-            .append(',');
-        sb.append("\"account\":").append(transaction.getAccountName());
+        sb.append("\"account\": \"").append(transaction.getAccountName()).append("\", ");
+        sb.append("\"balance\": ").append(PrintUtils.writeCurrency(this.getBalance().toString()));
         sb.append('}');
         System.out.println(sb.toString());
       } else {

@@ -165,6 +165,8 @@ public class Client {
 
 
   public static boolean checkBalance(Session session, String accountName) throws IOException {
+
+
     File cardFile = new File(session.getCard());
     if (!cardFile.exists()) {
       System.exit(255);
