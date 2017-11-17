@@ -1,0 +1,1 @@
+The bug demonstrated here is when a valid create account command is made the bank and atm both crash. The expected response is the account should be created.
