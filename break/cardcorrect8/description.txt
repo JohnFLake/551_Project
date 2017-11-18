@@ -1,0 +1,1 @@
+The bank fails when asked to make an account for someone when a conflicting name card already exists. It appears that when the atm socket terminates abnormally it causes an uncaught exception on the bank.
