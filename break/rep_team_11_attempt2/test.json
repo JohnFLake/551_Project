@@ -3,7 +3,7 @@
     "target_team": 11,
     "inputs": [
         {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "user", "-n", "10.00"],"base64":false},
-        {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "user", "-d", "1.00"],"base64":false},
+        {"input":["-p", "4000", "-i", "%IP%", "-a", "user", "-d", "1.00"],"base64":false},
         {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "user", "-g"],"base64":false}
     ]
 }
