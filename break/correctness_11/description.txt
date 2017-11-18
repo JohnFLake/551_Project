@@ -1,0 +1,1 @@
+A null pointer exception is thrown by the bank if an account that does not exist is queried
