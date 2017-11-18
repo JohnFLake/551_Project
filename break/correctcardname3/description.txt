@@ -1,0 +1,3 @@
+The bug in this program is if you create an account and make the card file not the default one and try to create another account with the default card file name
+you can not create that account. For example create account ryan with card bob.card if you create an account for bob with the default card file it won't
+let you.
