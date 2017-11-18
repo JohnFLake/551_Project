@@ -1,0 +1,5 @@
+Team 13 uses ssl for communications, but it appears that the bank exits on any
+ssl failures. I discovered this case while attempting a replay attack so the
+man in the middle code is a replay. That said, based on my limited analysis
+thus far, it appears that any injection of unsigned communications would
+cause the bank to crash.
