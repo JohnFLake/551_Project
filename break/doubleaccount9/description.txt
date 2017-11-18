@@ -1,0 +1,2 @@
+This bug is when a user creates an account then tries to create an account with the same name again.
+After that you can no longer do any transactions with the account thus I believe it locks the account out.
