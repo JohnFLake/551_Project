@@ -1,0 +1,3 @@
+Team 11 doesn't use any sort of nonce in their messages.  I slightly altered the mitm template to re-send data that the atm sends to the server.  This causes, for instance, deposits to be recorded multiple times.  
+
+The attack takes a bit of time, as it seems that the server blocks the second packet until it finishes dealing with the first.  
