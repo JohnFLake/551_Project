@@ -1,0 +1,4 @@
+Team 11 doesn't use any sort of nonce in their messages. This allows for
+arbitrary requests to be replayed by a man in the middle to replay deposits or
+withdrawals. This demonstration uses the deposit case.
+
