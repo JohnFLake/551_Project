@@ -1,0 +1,1 @@
+The program checks to see if .card is appended to the end of the card file and if not will add .card. However this is a bug because card files dont have to end in .card.
