@@ -1,0 +1,1 @@
+This bug is when you create an account with the non-default card file you cannot do any transactions with that account.
