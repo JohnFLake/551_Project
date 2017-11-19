@@ -1,0 +1,1 @@
+This bug is you cannot name the card file bank. This is probably due to the fact there is a file bank in their program that cannot be overwritten.
