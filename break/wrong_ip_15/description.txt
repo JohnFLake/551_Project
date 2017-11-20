@@ -1,1 +1,0 @@
-Team doesn't handle correctly the case when the atm is given the wrong IP address. 
