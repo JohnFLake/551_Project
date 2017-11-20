@@ -1,6 +1,6 @@
 {
     "type": "correctness",
-    "target_team": 12,
+    "target_team": 13,
     "inputs": [
         {"input":["-aray","-n10.00"],"base64":false},
         {"input":["-garay"],"base64":false}
