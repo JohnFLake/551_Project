@@ -1,0 +1,8 @@
+{
+    "type": "correctness",
+    "target_team": 11,
+    "inputs": [
+        {"input":["-a ray -n 10.00"],"base64":false},
+        {"input":["-ga ray"],"base64":false}
+    ]
+}

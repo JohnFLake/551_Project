@@ -1,0 +1,1 @@
+You cannot give arguments in the form "-ga ray" to the atm.  It interprets "-ga" as one argument.  
