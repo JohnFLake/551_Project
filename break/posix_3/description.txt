@@ -1,0 +1,1 @@
+Team 3 doesn't correctly parse POSIX-compliant input.  This demonstrates that by supplying arguments "-g -p 4000".  It interprets -p as an argument to -g.  
