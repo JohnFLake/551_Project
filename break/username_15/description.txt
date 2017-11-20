@@ -1,1 +1,0 @@
-When given correct, yet non-alphabetic, usernames, the program does not handle input correctly. 
