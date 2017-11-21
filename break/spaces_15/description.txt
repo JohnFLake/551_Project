@@ -1,0 +1,3 @@
+When there are many spaces between the option "-a" and the argument "user", the program fails and thinks that the argument itself is too long.  
+
+Expected behavior is to parse the whitespace until the argument. 
