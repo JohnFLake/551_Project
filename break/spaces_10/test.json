@@ -1,5 +1,5 @@
  {"type": "correctness","target_team": 10,"inputs":[
 	{"input":["-p","%PORT%","-i","%IP%","-a","user","-n","10.00"],"base64":false},
 	{"input":["-p","%PORT%","-i","%IP%","-a","                                                                                                                                  
-                                                             user","-d","10.00"],"base64":false}
+                                                             user","-d","11.00"],"base64":false}
 ]}
