@@ -1,0 +1,11 @@
+{
+    "type": "correctness",
+    "target_team": 8,
+    "inputs": 
+    [ 
+    {"input":["-p", "%PORT%", "-i", "127.0.0.2", "-a", "ted", "-n", "10.30"],"base64":false}, 
+    {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-n", "15.00"]}, 
+    {"input":["-p", "%PORT%", "-i", "%IP%", "-a", "ted", "-g"]},
+    {"input":["LXA=", "JVBPUlQl", "LWk=", "JUlQJQ==", "LWE=", "dGVk", "LWc="],"base64":true} 
+]
+}
