@@ -1,0 +1,1 @@
+This demonstrates when an account is created normally and then when you try to make a deposit, the man in the middle sends the proper the data to the bank but the message sent to the user is a random string. Therefore, the bank updates the balance but the user at the atm thinks the transaction didn’t go through. The bank should have rolled back the transaction. 
