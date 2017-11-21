@@ -1,0 +1,1 @@
+The bug here is when you try to create an account with the wrong IP address it will create a card file on the ATM but never connects to the bank. Then when you try to create an account with the same name on the right IP address the account will not create because the card file already exists
