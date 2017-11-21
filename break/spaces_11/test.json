@@ -1,4 +1,4 @@
- {"type": "correctness","target_team": 3,"inputs":[
+ {"type": "correctness","target_team": 11,"inputs":[
 	{"input":["-p","%PORT%","-i","%IP%","-a","user","-n","10.00"],"base64":false},
 	{"input":["LWE=","ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVzZXI=","LWQ=","MTEuMDA="],"base64":true}
 ]}
