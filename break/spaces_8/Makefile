@@ -1,4 +1,4 @@
-all: no
+all: none
 
-no: 
+none: 
 	echo "Nothing to do."
