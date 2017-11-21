@@ -1,0 +1,1 @@
+This demonstrates when man in the middle is being used on team 4 the program automatically shuts down. The mite program used starts out routing the data normally and does nothing harmful but the program still stops
