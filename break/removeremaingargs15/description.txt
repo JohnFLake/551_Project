@@ -1,0 +1,1 @@
+When the & symbol is used it does not check that this is invalid input instead it ignores the remaining args after & which throws a null pointer exception
