@@ -1,0 +1,1 @@
+when you create a normal account with a name and then try to create another account with that name and add an asterik to the end of the account name it creates an account with the name+.card when it should return a correctness error
