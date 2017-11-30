@@ -1,0 +1,2 @@
+The team only uses a number from 0 - 9999 as the card contents. As a result, the content of the card file for an arbitrary account is easily guessed using brute force.
+This attack doesn't always work due to the server timeout. However, on my own test system I was able to brute force a card in 1h40m on average and 3h20m guaranteed (based on the rate at which I could send requests to the bank).
