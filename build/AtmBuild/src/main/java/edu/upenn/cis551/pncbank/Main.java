@@ -84,11 +84,8 @@ public class Main {
     }
 
 
-    for (String s : args) {
-      System.err.println("Arg: " + s);
-    }
     CommandLine cmd = parser.parse(options, args);
-    System.err.println("Parsed arguments.");
+    // System.err.println("Parsed arguments.");
 
 
     // Remove the underscore we added.
@@ -107,6 +104,7 @@ public class Main {
     }
 
 
+
     // Checks if this is a proper transaction.
     if (!InputValidator.properTransaction(cmd)) {
       System.exit(255);
@@ -119,17 +117,23 @@ public class Main {
       System.exit(255);
     } else {
       accountName = cmd.getOptionValue("a");
+      if (aH)
+        accountName = accountName.substring(1);
       if (!InputValidator.isValidAccountName(accountName)) {
         System.exit(255);
       }
 
       // Default card file
       cardFile = accountName + ".card";
+      if (cH)
+        cardFile = cardFile.substring(1);
     }
 
 
     // AUTHFILE AND KEY:
     authFile = cmd.getOptionValue("s", "bank.auth");
+    if (sH)
+      authFile = authFile.substring(1);
     if (!InputValidator.isValidFile(authFile)) {
       System.exit(255);
     }
@@ -157,6 +161,8 @@ public class Main {
     // CARD FILE:
     if (cmd.hasOption("c")) {
       cardFile = cmd.getOptionValue("c");
+      if (cH)
+        cardFile = cardFile.substring(1);
       if (!InputValidator.isValidFile(cardFile)) {
         System.exit(255);
       }
