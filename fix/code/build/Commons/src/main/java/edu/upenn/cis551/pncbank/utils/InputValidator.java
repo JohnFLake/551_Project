@@ -195,6 +195,9 @@ public class InputValidator {
     }
 
     String[] tokens = str.split("\\.");
+    if(tokens.length != 4) {
+    		return false;
+    }
     for (String tok : tokens) {
       if (!tok.matches("(0|[1-9][0-9]*)")) {
         return false;
