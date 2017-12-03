@@ -1,1 +1,0 @@
-We fixed the issue we had when parsing command line options.  If an argument to one option started with a hyphen it would interpret that as a new option.  To solve this, we temporarily prepended string arguments with underscores when CLI did its parsing.  Additionally, if any arguments other than options occurred after the "-g" option, we exit with an error code.  
