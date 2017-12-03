@@ -54,12 +54,65 @@ public class Main {
     CommandLineParser parser = new DefaultParser();
     // Attempt to parse the options:
 
+    boolean sH = false;
+    boolean cH = false;
+    boolean aH = false;
+    // For any argument that accepts a string, make sure that the string can start with a hyphen
+    for (int i = 0; i < args.length - 1; i++) {
+      String arg = args[i];
+      if (arg.equals("-s")) {
+        sH = true;
+        StringBuilder argChanger = new StringBuilder();
+        argChanger.append("_");
+        argChanger.append(args[i + 1]);
+        args[i + 1] = argChanger.toString();
+      } else if (arg.equals("-a")) {
+        aH = true;
+        StringBuilder argChanger = new StringBuilder();
+        argChanger.append("_");
+        argChanger.append(args[i + 1]);
+        args[i + 1] = argChanger.toString();
+      } else if (arg.equals("-c")) {
+        cH = true;
+        StringBuilder argChanger = new StringBuilder();
+        argChanger.append("_");
+        argChanger.append(args[i + 1]);
+        args[i + 1] = argChanger.toString();
+      }
+
+
+    }
+
+
+    for (String s : args) {
+      System.err.println("Arg: " + s);
+    }
     CommandLine cmd = parser.parse(options, args);
+    System.err.println("Parsed arguments.");
+
+
+    // Remove the underscore we added.
+    for (int i = 0; i < args.length - 1; i++) {
+      String arg = args[i];
+      if (arg.equals("-s")) {
+        if (sH)
+          args[i + 1] = args[i + 1].substring(1);
+      } else if (arg.equals("-a")) {
+        if (aH)
+          args[i + 1] = args[i + 1].substring(1);
+      } else if (arg.equals("-c")) {
+        if (cH)
+          args[i + 1] = args[i + 1].substring(1);
+      }
+    }
+
 
     // Checks if this is a proper transaction.
     if (!InputValidator.properTransaction(cmd)) {
       System.exit(255);
     }
+
+
 
     // ACCOUNTNAME:
     if (!cmd.hasOption("a")) {
