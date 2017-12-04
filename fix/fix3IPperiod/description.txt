@@ -1,0 +1,1 @@
+The bug in our program is when a user typed in an IP address it would only address the valid numerical digit range for each section of the IP address. It did not check to make sure there are only 3 periods in the IP address therefore additional periods could be added to the end of the address. I fixed this by checking the number of periods in the IP strings
