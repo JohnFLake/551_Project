@@ -1,0 +1,1 @@
+The bug in this was we did not handle timeouts correctly by having the program timeout in 10 seconds when the wrong IP was provided. Our error was we did not use the command "setSoTimeout" correctly to properly timeout after 10 seconds. We looked up the documentation on setSoTimeout and implemented it correctly in this fix.
