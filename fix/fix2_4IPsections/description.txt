@@ -1,0 +1,1 @@
+The bug in our program is when a user typed in an IP address it would only address the valid numerical digit range for each section of the IP address. It did not check to make sure there were 4 sections in the IP address. This fix checks that there are 4 sections and if not exits with 255
