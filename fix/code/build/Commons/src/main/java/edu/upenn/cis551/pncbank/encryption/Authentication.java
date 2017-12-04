@@ -102,10 +102,16 @@ public class Authentication {
     byte[] data = Files.readAllBytes(path);
 
     // Take the string and convert it to a secret key.
+    try {
     byte[] key = Base64.getDecoder().decode(data);
+    
     // rebuild key using SecretKeySpec
     SecretKey aesKey = new SecretKeySpec(key, 0, key.length, "AES");
     return aesKey;
+    }
+    catch (IllegalArgumentException e) {
+    	 throw new IOException (e); 
+    }
   }
 
 }
