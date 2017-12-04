@@ -2,6 +2,7 @@ package edu.upenn.cis551.pncbank;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import javax.crypto.SecretKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,9 +37,10 @@ public class Client {
       System.exit(255);
     }
 
-    try (Socket AtmBank = new Socket(session.getIP(), session.getPort())) {
+    try (Socket AtmBank = new Socket()) {
 
-      AtmBank.setSoTimeout(10 * 1000);
+      AtmBank.connect(new InetSocketAddress(session.getIP(), session.getPort()), 10000);
+      AtmBank.setSoTimeout(10000);
 
       // Send the encrypted bytes and receive a response:
       if (!resonseExpected) {
