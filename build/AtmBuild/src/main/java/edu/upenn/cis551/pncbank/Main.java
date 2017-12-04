@@ -60,19 +60,19 @@ public class Main {
     // For any argument that accepts a string, make sure that the string can start with a hyphen
     for (int i = 0; i < args.length - 1; i++) {
       String arg = args[i];
-      if (arg.equals("-s")) {
+      if (arg.equals("-s") || arg.equals("-gs")) {
         sH = true;
         StringBuilder argChanger = new StringBuilder();
         argChanger.append("_");
         argChanger.append(args[i + 1]);
         args[i + 1] = argChanger.toString();
-      } else if (arg.equals("-a")) {
+      } else if (arg.equals("-a") || arg.equals("-ga")) {
         aH = true;
         StringBuilder argChanger = new StringBuilder();
         argChanger.append("_");
         argChanger.append(args[i + 1]);
         args[i + 1] = argChanger.toString();
-      } else if (arg.equals("-c")) {
+      } else if (arg.equals("-c") || arg.equals("-gc")) {
         cH = true;
         StringBuilder argChanger = new StringBuilder();
         argChanger.append("_");
