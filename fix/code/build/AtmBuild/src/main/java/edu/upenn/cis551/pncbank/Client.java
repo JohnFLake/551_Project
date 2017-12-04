@@ -116,6 +116,13 @@ public class Client {
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session, true);
+    
+    if(!tResponse.isOk()) {
+		File f = new File(session.getCard());
+		f.delete();
+		System.exit(255);
+    		}
+    
     handleResponse(pojo, tResponse, newCard, session.getCard(), session);
     // Note, there's no way that the bank can suggest a retry for this type of request.
   }
@@ -137,13 +144,7 @@ public class Client {
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session, true);
-    
-    if(!tResponse.isOk()) {
-		File f = new File(session.getCard());
-		f.delete();
-		System.exit(255);
-    		}
-    
+        
     return handleResponse(pojo, tResponse, checkCard, session.getCard(), session);
   }
 
