@@ -195,6 +195,18 @@ public class InputValidator {
     }
 
     String[] tokens = str.split("\\.");
+    
+    int counter = 0;
+    for(int i = 0; i < str.length(); i++) {
+    		if (str.charAt(i) == '.') {
+    			counter++;
+    		}
+    }
+    
+    if(counter != 3) {
+    		return false;
+    }
+    
     if(tokens.length != 4) {
     		return false;
     }
