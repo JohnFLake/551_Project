@@ -1,0 +1,1 @@
+The bug here is our program does not exit with 255 when the wrong auth file is presented to the atm. We fixed this by throwing the proper IllegalArgumentException and makes the program exit with 255. Also the description provided by teams in their break says this crashes the bank, this does not crash the bank... as the bank still runs after the error.  
