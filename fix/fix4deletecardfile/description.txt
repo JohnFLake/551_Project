@@ -1,0 +1,1 @@
+The problem in our code is that if an account is already created and a user tries to create that account again with a different card file then the program will exit correctly but will not delete the new card file associated with the account. We fixed our program to delete that card file to properly roll back the bad transaction. 
