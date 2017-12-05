@@ -81,13 +81,15 @@ public class Main {
         args[i + 1] = argChanger.toString();
       }
 
-
     }
 
 
     CommandLine cmd = parser.parse(options, args);
     // System.err.println("Parsed arguments.");
 
+    if (cmd.getArgList().size() != 0) {
+      System.exit(255);
+    }
 
     // Remove the underscore we added.
     for (int i = 0; i < args.length - 1; i++) {
@@ -168,6 +170,7 @@ public class Main {
         System.exit(255);
       }
     }
+
     return cmd;
   }
 
