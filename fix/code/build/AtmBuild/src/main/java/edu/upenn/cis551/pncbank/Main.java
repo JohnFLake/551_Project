@@ -7,10 +7,10 @@ import java.util.HashSet;
 import javax.crypto.SecretKey;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import edu.upenn.cis551.pncbank.encryption.Authentication;
 import edu.upenn.cis551.pncbank.exception.NoRequestException;
 import edu.upenn.cis551.pncbank.utils.InputValidator;
@@ -51,7 +51,7 @@ public class Main {
       throws ParseException, IOException {
 
 
-    CommandLineParser parser = new DefaultParser();
+    CommandLineParser parser = new PosixParser();
     // Attempt to parse the options:
 
     boolean sH = false;
