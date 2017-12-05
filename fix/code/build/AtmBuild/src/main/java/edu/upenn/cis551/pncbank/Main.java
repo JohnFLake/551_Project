@@ -51,6 +51,7 @@ public class Main {
       throws ParseException, IOException {
 
 
+    @SuppressWarnings("deprecation")
     CommandLineParser parser = new PosixParser();
     // Attempt to parse the options:
 
