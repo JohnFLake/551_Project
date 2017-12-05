@@ -36,6 +36,7 @@ public class Main {
     options.addOption("d", true, "Deposit money");
     options.addOption("w", true, "Withdrawl Money");
     options.addOption("g", false, "Check Balance");
+
   }
 
   public static void setDefaults() {
@@ -84,12 +85,38 @@ public class Main {
     }
 
 
+
     CommandLine cmd = parser.parse(options, args);
     // System.err.println("Parsed arguments.");
+
+    for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--")) {
+
+        if (cmd.hasOption("c")) {
+          if (cmd.getOptionValue("c").equals("--")) {
+            break;
+          }
+        }
+
+        if (cmd.hasOption("s")) {
+          if (cmd.getOptionValue("s").equals("--")) {
+            break;
+          }
+        }
+
+        if (cmd.hasOption("a")) {
+          if (cmd.getOptionValue("a").equals("--")) {
+            break;
+          }
+        }
+        System.exit(255);
+      }
+    }
 
     if (cmd.getArgList().size() != 0) {
       System.exit(255);
     }
+
 
     // Remove the underscore we added.
     for (int i = 0; i < args.length - 1; i++) {
@@ -108,12 +135,11 @@ public class Main {
 
 
 
+
     // Checks if this is a proper transaction.
     if (!InputValidator.properTransaction(cmd)) {
       System.exit(255);
     }
-
-
 
     // ACCOUNTNAME:
     if (!cmd.hasOption("a")) {
