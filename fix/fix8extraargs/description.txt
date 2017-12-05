@@ -1,0 +1,1 @@
+The bug in this is that we do not check if there are random arguments at the end of the command line. We fixed this by using the “getArgList” which shows if there are unused args and if so the program now exits.
