@@ -1,0 +1,1 @@
+The bug in this was we were using DefaultParser instead of PosixParser. DefaultParser allows symbols like "--" to be read in with out throwing errors and "=" before a character to be read as a space. However, PosixParser remains full Posix compliance and does not allow that type of input.
