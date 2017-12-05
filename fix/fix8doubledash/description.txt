@@ -1,0 +1,1 @@
+The bug here is that we were fully POSIX compliant when the specs said we should not make -- and end of argument we fixed this by if -- is not for a specific option to exit with 255
