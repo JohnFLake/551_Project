@@ -1,0 +1,3 @@
+A team was able to determine how much money a particular person has in their account by performing a binary search using deposit/withdrawal requests and using the fact that failures didn't receive acks from the bank.  They used this to detect withdrawal didn't go through, and therefore were able to determine with some confidence the amount in an account.   
+
+We previously only gave acks when transactions failed.  Our fix is to send acks for every transaction, regardless of failure or not.  
