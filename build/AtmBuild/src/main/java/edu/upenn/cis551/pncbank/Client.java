@@ -116,14 +116,14 @@ public class Client {
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session, true);
-    
+
     // Roll back transaction and delete card file if account cannot be created
-    if(!tResponse.isOk()) {
-		File f = new File(session.getCard());
-		f.delete();
-		System.exit(255);
-}
-    
+    if (!tResponse.isOk()) {
+      File f = new File(session.getCard());
+      f.delete();
+      System.exit(255);
+    }
+
     handleResponse(pojo, tResponse, newCard, session.getCard(), session);
     // Note, there's no way that the bank can suggest a retry for this type of request.
   }
@@ -210,6 +210,11 @@ public class Client {
    */
   private static boolean handleResponse(AbstractRequest request, TransactionResponse response,
       CardFile card, String cardName, Session session) {
+    try {
+      sendAck(session, request);
+    } catch (IOException e) {
+      // Not an issue, since a missed ack is recoverable
+    }
     if (response.isOk()) {
       if (request instanceof BalanceRequest) {
         System.out.println(response.toString());
@@ -218,11 +223,6 @@ public class Client {
       }
       System.out.flush();
       updateCardSeqNumber(card, cardName, response.getSequence() + 1);
-      try {
-        sendAck(session, request);
-      } catch (IOException e) {
-        // Not an issue, since a missed ack is recoverable
-      }
       return true;
     } else {
       // Bank failed the transaction.
