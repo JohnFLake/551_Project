@@ -2,7 +2,6 @@ package edu.upenn.cis551.pncbank;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import javax.crypto.SecretKey;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,10 +36,9 @@ public class Client {
       System.exit(255);
     }
 
-    try (Socket AtmBank = new Socket()) {
+    try (Socket AtmBank = new Socket(session.getIP(), session.getPort())) {
 
-      AtmBank.connect(new InetSocketAddress(session.getIP(), session.getPort()), 10000);
-      AtmBank.setSoTimeout(10000);
+      AtmBank.setSoTimeout(10 * 1000);
 
       // Send the encrypted bytes and receive a response:
       if (!resonseExpected) {
@@ -118,13 +116,14 @@ public class Client {
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session, true);
-    
-    if(!tResponse.isOk()) {
-		File f = new File(session.getCard());
-		f.delete();
-		System.exit(255);
-    		}
-    
+
+    // Roll back transaction and delete card file if account cannot be created
+    if (!tResponse.isOk()) {
+      File f = new File(session.getCard());
+      f.delete();
+      System.exit(255);
+    }
+
     handleResponse(pojo, tResponse, newCard, session.getCard(), session);
     // Note, there's no way that the bank can suggest a retry for this type of request.
   }
@@ -146,7 +145,6 @@ public class Client {
 
     // Send pojo and get response. Print it.
     TransactionResponse tResponse = sendPOJO(pojo, session, true);
-        
     return handleResponse(pojo, tResponse, checkCard, session.getCard(), session);
   }
 
@@ -212,6 +210,11 @@ public class Client {
    */
   private static boolean handleResponse(AbstractRequest request, TransactionResponse response,
       CardFile card, String cardName, Session session) {
+    try {
+      sendAck(session, request);
+    } catch (IOException e) {
+      // Not an issue, since a missed ack is recoverable
+    }
     if (response.isOk()) {
       if (request instanceof BalanceRequest) {
         System.out.println(response.toString());
@@ -220,11 +223,6 @@ public class Client {
       }
       System.out.flush();
       updateCardSeqNumber(card, cardName, response.getSequence() + 1);
-      try {
-        sendAck(session, request);
-      } catch (IOException e) {
-        // Not an issue, since a missed ack is recoverable
-      }
       return true;
     } else {
       // Bank failed the transaction.
@@ -239,3 +237,4 @@ public class Client {
     }
   }
 }
+
